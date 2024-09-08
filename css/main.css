@@ -1,0 +1,54 @@
+body {
+    background-color: #001247;
+}
+header{
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    background-color: white;
+}
+.containerLogo{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-left: 20px;
+}
+.logo{
+
+    width:80px;
+    height: auto;
+}
+
+.nav,.nav-kiri,.nav-kanan{
+    display: flex;
+    align-items: center;
+    padding-right: 10px;
+    width: 100% ;
+}
+.nav-kiri{
+    justify-content: flex-start;
+}
+.nav-kanan{
+    justify-content: flex-end;
+    width: fit-content;
+}
+.nav-kanan>*{
+    display: block;
+}
+.navbar{
+    margin: 10px;
+    padding:10px 10px;
+}
+.navbar:hover{
+    border-radius: 10px;
+    border-right: 4px solid red;
+    border-bottom: 4px solid red;
+    background-color: #80808075;
+}
+a{
+    color: black;
+    text-decoration: none;
+}

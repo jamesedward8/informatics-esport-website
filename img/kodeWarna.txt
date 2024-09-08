@@ -1,0 +1,8 @@
+Text 
+Prompt
+Montaser Arabic 
+ 
+warna : 
+#001247
+#f15a24
+#ffffff
