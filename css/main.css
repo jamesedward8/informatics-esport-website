@@ -33,7 +33,8 @@ header{
 }
 .nav-kanan{
     justify-content: flex-end;
-    width: fit-content;
+    width: -moz-fit-content;
+    width: fit-content; /* Add this line to support Firefox */
 }
 .nav-kanan>*{
     display: block;
