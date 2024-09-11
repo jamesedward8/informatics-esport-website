@@ -1,6 +1,7 @@
 body {
     background-color: #001247;
 }
+
 header{
     display: flex;
     position: fixed;
@@ -28,28 +29,169 @@ header{
     padding-right: 10px;
     width: 100% ;
 }
+
 .nav-kiri{
     justify-content: flex-start;
 }
+
 .nav-kanan{
     justify-content: flex-end;
     width: -moz-fit-content;
+    width: -moz-fit-content; /* Add this line to support Firefox */
     width: fit-content; /* Add this line to support Firefox */
 }
+
 .nav-kanan>*{
     display: block;
 }
+
 .navbar{
     margin: 10px;
     padding:10px 10px;
 }
+
 .navbar:hover{
     border-radius: 10px;
     border-right: 4px solid red;
     border-bottom: 4px solid red;
     background-color: #80808075;
 }
+
 a{
     color: black;
+    display: block;
     text-decoration: none;
+}
+
+.tableEvent {
+    width: 90%;
+    border: 2px solid white;
+    border-collapse: collapse;
+}
+
+tr, th, td {
+    border: 2px solid white;
+    padding: 10px;
+    color: rgb(255, 127, 47);
+    text-align: center;
+    width: auto;
+    height: 100px;
+}
+
+.content-title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 80px;
+}
+
+.h1-content-title {
+    margin-top: 250px;
+    position: fixed;
+    color: rgb(255, 165, 91);
+    font-size: 50px;
+}
+
+.content-event {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+}
+
+.side-content-event {
+    display: flex;
+    justify-content: right;
+    align-items: right;
+    margin-top: 120px;
+    margin-right: 90px;
+    border-radius: 10px;
+}
+
+.btn-add-ev {
+    width: 100px;
+    height: 40px;
+    font-size: 20px;
+    background-color: orange;
+    color: white;
+    border: none;
+    border-radius: 10px;
+}
+
+.td-event-edit {
+    color: greenyellow;
+    text-align: center;
+}
+
+.label-edit-event {
+    color: orange;
+    font-size: 20px;
+}
+
+.input-edit-event {
+    width: 400px;
+    height: 30px;
+    margin: 10px;
+    font-size: 20px;
+}
+
+.ta-edit-event {
+    width: 540px;
+    height: 100px;
+    margin-right: 10px;
+    margin-top: 20px;   
+    font-size: 20px;
+}
+
+.btn-edit-event {
+    width: 170px;
+    height: 40px;
+    margin: 20px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    background-color: orange;
+    color: white;
+    border: none;
+    border-radius: 10px;
+}
+
+.td-event-delete {
+    color: red;
+    text-align: center;
+}
+
+.label-add-event {
+    color: orange;
+    font-size: 20px;
+}
+
+.input-add-event {
+    width: 400px;
+    height: 30px;
+    margin: 10px;
+    font-size: 20px;
+}
+
+.ta-add-event {
+    width: 540px;
+    height: 100px;
+    margin-right: 10px;
+    margin-top: 20px;   
+    font-size: 20px;
+}
+
+.btn-add-event {
+    width: 150px;
+    height: 40px;
+    margin: 20px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    background-color: orange;
+    color: white;
+    border: none;
+    border-radius: 10px;
 }
