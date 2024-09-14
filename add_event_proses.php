@@ -24,7 +24,6 @@
 
         echo "<script>
                 alert('Data added successfully!');
-                alert('".$affected." data added');
                 window.location.href='event.php?result=added';
             </script>";
     }

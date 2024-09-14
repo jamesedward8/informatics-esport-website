@@ -20,7 +20,7 @@ $user = "admin";
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/main.css">
-    <title>Event</title>
+    <title>Game</title>
 </head>
 <body>
     <header class="header">
@@ -45,16 +45,16 @@ $user = "admin";
     <main class="content">
         <article>
             <div class="content-title">
-                <h1 class="h1-content-title">Event Dashboard</h1>
+                <h1 class="h1-content-title">Game Dashboard</h1>
             </div>
             <div class="side-content-event">
-                <form action="add_event.php" method="POST">
+                <form action="add_game.php" method="POST">
                     <input type="submit" class="btn-add-ev" value="Add" name="btnAdd">
                 </form>
             </div>
             <div class="content-event">
                 <?php
-                    $stmt = $mysqli->prepare("SELECT * FROM event");
+                    $stmt = $mysqli->prepare("SELECT * FROM game");
                     $stmt->execute();
                     $res = $stmt->get_result();
 
@@ -63,9 +63,7 @@ $user = "admin";
                     echo "<table class='tableEvent'>";
                     echo "<thead>";
                     echo "<tr>
-                            <th>Number</th>     
-                            <th>Event Name</th>
-                            <th>Date</th>
+                            <th>Game</th>     
                             <th>Description</th>
                             <th colspan=2>Action</th>
                         </tr>";
@@ -75,22 +73,18 @@ $user = "admin";
 
                     if ($res->num_rows == 0) {
                         echo "<tr>
-                                <td colspan='5'>No Event Available, Stay Tuned!</td>
+                                <td colspan='3'>No Game Available, Stay Tuned!</td>
                             </tr>";
                     }
 
                     else {
                         while ($row = $res->fetch_assoc()) {
-                            $date = new DateTime($row['date']);
-                            $formatDate = $date->format('d F Y');
 
                             echo "<tr>
-                                    <td>" . $row['idevent'] . "</td>
                                     <td>" . $row['name'] . "</td>
-                                    <td>" . $formatDate . "</td>
                                     <td>" . $row['description'] . "</td>
-                                    <td><a class='td-event-edit' href='edit_event.php?idevent=". $row['idevent'] ."' 'style = 'display:".(($user=="admin")?"yes":"none")."';>Edit</a></td>
-                                    <td><a class='td-event-delete' href='delete_event.php?idevent=". $row['idevent'] ."' 'style = 'display:".(($user=="admin")?"yes":"none")."';>Delete</a></td>
+                                    <td><a class='td-event-edit' href='edit_game.php?idgame=". $row['idgame'] ."' 'style = 'display:".(($user=="admin")?"yes":"none")."';>Edit</a></td>
+                                    <td><a class='td-event-delete' href='delete_game.php?idgame=". $row['idgame'] ."' 'style = 'display:".(($user=="admin")?"yes":"none")."';>Delete</a></td>
                                 </tr>";  
                         }
                     }

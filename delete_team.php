@@ -19,7 +19,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/main.css">
-    <title>Delete Event</title>
+    <title>Delete Team</title>
 </head>
 <body>
     <header class="header">
@@ -31,10 +31,10 @@
             <div class="nav-kiri">
                 <a href="home.php" <?php echo "style = 'display:".(($user=="admin")?"yes":"none")."';"?>><nav class="navbar">Home</nav></a>
                 <a href="event.php" <?php echo "style = 'display:yes';" ?>><nav class="navbar">Event</nav></a>
-                <nav class="navbar">Division</nav>  
-                <nav class="navbar">Ya Team</nav>
-                <nav class="navbar">Recruitment</nav>
-                <nav class="navbar">Manage </nav>  
+                <a href="game.php" <?php echo "style = 'display:yes';" ?>><nav class="navbar">Division</nav></a>
+                <a href="team.php" <?php echo "style = 'display:yes';" ?>><nav class="navbar">Team</nav></a>
+                <a href="recruitment.php" <?php echo "style = 'display:yes';" ?>><nav class="navbar">Recruitment</nav></a>
+                <a href="manage.php" <?php echo "style = 'display:yes';" ?>><nav class="navbar">Manage</nav></a>  
             </div>
             <div class="nav-kanan">
                 <button>Login</button>
@@ -44,16 +44,16 @@
     <main class="content">
         <article>
             <div class="content-title">
-                <h1 class="h1-content-title">Deleting Event</h1>
+                <h1 class="h1-content-title">Deleting Game</h1>
             </div>
             <div class="content-event">     
             <?php
-                if (isset($_GET['idevent'])) {
-                    if ($_GET['idevent'] != null) {
-                        $idevent = $_GET['idevent'];
+                if (isset($_GET['idteam'])) {
+                    if ($_GET['idteam'] != null) {
+                        $idteam = $_GET['idteam'];
 
-                        $stmt = $mysqli->prepare("DELETE FROM event WHERE idevent = ?");
-                        $stmt->bind_param("i", $idevent);
+                        $stmt = $mysqli->prepare("DELETE FROM team WHERE idteam = ?");
+                        $stmt->bind_param("i", $idteam);
                         $stmt->execute();
 
                         $affected = $stmt->affected_rows;
@@ -61,7 +61,7 @@
                         echo "<script>
                                 alert('Data deleted successfully!');
                                 alert('".$affected." data updated');
-                                window.location.href='event.php?idevent=$idevent&result=updated';
+                                window.location.href='team.php?idevent=$idteam&result=updated';
                             </script>";
 
                         $stmt->close();

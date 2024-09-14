@@ -16,8 +16,8 @@
     if (isset($_POST['btnEditEv'])) {
         extract($_POST);
 
-        $stmt = $mysqli->prepare("UPDATE event SET name = ?, date = ?, description = ? WHERE idevent = ?");
-        $stmt->bind_param("sssi", $name, $date, $desc, $idevent);
+        $stmt = $mysqli->prepare("UPDATE game SET name = ?,  description = ? WHERE idgame = ?");
+        $stmt->bind_param("ssi", $name, $desc, $idgame);
         $stmt->execute();
 
         $affected = $stmt->affected_rows;
@@ -25,7 +25,7 @@
 
         echo "<script>
                 alert('Data updated successfully!');
-                window.location.href='event.php?idevent=$idevent&result=updated';
+                window.location.href='team.php?idteam=$idteam&result=updated';
             </script>";
     }
 

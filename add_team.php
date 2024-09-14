@@ -19,7 +19,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/main.css">
-    <title>Add Event</title>
+    <title>Add Team</title>
 </head>
 <body>
     <header class="header">
@@ -44,27 +44,37 @@
     <main class="content">
         <article>
             <div class="content-title">
-                <h1 class="h1-content-title">Adding Event</h1>
+                <h1 class="h1-content-title">Adding Team</h1>
             </div>
             <div class="content-event">     
-                <form action="add_event_proses.php" method="POST">
+                <form action="add_team_proses.php" method="POST">
                     <br><br><br><br><br><br><br><br><br><br><br><br>
                     <div class="mb-3">
-                        <label for="name" class="form-label, label-add-event">Event Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                        <input type="text" name="name" class="form-control, input-add-event" id="name" placeholder="Enter event name here...">
+                        <label for="name" class="form-label, label-add-event">Team Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                        <input type="text" name="name" class="form-control, input-add-event" id="name" placeholder="Enter team name here...">
                     </div>
                     <br><br>
+
                     <div class="mb-3">
-                        <label for="date" class="form-label, label-add-event">Date:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                        <input type="text" name="date" class="form-control, input-add-event" id="date" placeholder="Enter event date here (yyyy-MM-dd)...">
+                        <label for="idgame" class="form-label, label-add-event">Game Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+
+                        <?php  
+                                $stmt = $mysqli->prepare("SELECT * from game");
+                                $stmt->execute();
+                                $res = $stmt->get_result();
+                                ?>
+                        <select name="idgame" id="idgame">
+                        <option value="">Pilih Game</option>
+                        <?php
+                            while($row = $res->fetch_assoc()) {
+                                echo "<option value=".$row['idgame'].">"
+                                      .$row['name']."</option>";
+                            }
+                       ?>
+                        </select>
                     </div>
                     <br><br>
-                    <div class="mb-3">
-                        <label for="desc" class="form-label, label-add-event">Description:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                        <br>
-                        <textarea class="form-control, ta-add-event" name="desc" id="desc" rows="5" placeholder="Enter event description here..."></textarea>
-                    </div>
-                    <br><br>
+                    
                     <div class="mb-3">
                         <input type="submit" class="btn-add-event" value="Add Event" name="btnAddEv">
                     </div>      

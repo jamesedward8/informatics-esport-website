@@ -8,24 +8,23 @@
 
     else {
         echo "Database connection succeed!";
-        echo "<br>";
     }
 
     $user = "admin";
 
-    if (isset($_POST['btnEditEv'])) {
+    if (isset($_POST['btnAddEv'])) {
         extract($_POST);
 
-        $stmt = $mysqli->prepare("UPDATE event SET name = ?, date = ?, description = ? WHERE idevent = ?");
-        $stmt->bind_param("sssi", $name, $date, $desc, $idevent);
+        $stmt = $mysqli->prepare("INSERT INTO achievement (idteam, name, date, description) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("isss", $idteam, $name, $date, $desc);
         $stmt->execute();
 
         $affected = $stmt->affected_rows;
         $stmt->close();
 
         echo "<script>
-                alert('Data updated successfully!');
-                window.location.href='event.php?idevent=$idevent&result=updated';
+                alert('Data added successfully!');
+                window.location.href='home.php?result=added';
             </script>";
     }
 
