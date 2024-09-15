@@ -46,9 +46,8 @@
             <div class="content-title">
                 <h1 class="h1-content-title">Adding Event</h1>
             </div>
-            <div class="content-event">     
+            <div class="content-submenu-event">     
                 <form action="add_event_proses.php" method="POST">
-                    <br><br><br><br><br><br><br><br><br><br><br><br>
                     <div class="mb-3">
                         <label for="name" class="form-label, label-add-event">Event Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
                         <input type="text" name="name" class="form-control, input-add-event" id="name" placeholder="Enter event name here...">
@@ -64,7 +63,7 @@
                         <br>
                         <textarea class="form-control, ta-add-event" name="desc" id="desc" rows="5" placeholder="Enter event description here..."></textarea>
                     </div>
-                    <br><br>
+                    <br><br>    
                     <div class="mb-3">
                         <input type="submit" class="btn-add-event" value="Add Event" name="btnAddEv">
                     </div>      

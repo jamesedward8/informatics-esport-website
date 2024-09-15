@@ -47,7 +47,7 @@
             <div class="content-title">
                 <h1 class="h1-content-title">Editing Event</h1>
             </div>
-            <div class="content-event">     
+            <div class="content-submenu-event">     
             <?php
                 if (isset($_GET['idevent'])) {
                     if ($_GET['idevent'] != null) {
@@ -62,7 +62,6 @@
             ?>
 
             <form action="edit_event_proses.php" method="POST">
-                <br><br><br><br><br><br><br><br><br><br><br><br>
                 <input type="hidden" name="idevent" value="<?php echo $event['idevent'] ?>">
                 <div class="mb-3">
                     <label for="name" class="form-label, label-edit-event">Event Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
