@@ -46,9 +46,9 @@
             <div class="content-title">
                 <h1 class="h1-content-title">Adding Game</h1>
             </div>
-            <div class="content-event">     
+            <div class="content-page">     
                 <form action="add_game_proses.php" method="POST">
-                    <br><br><br><br><br><br><br><br><br><br><br><br>
+                    <br><br><br><br><br>
                     <div class="mb-3">
                         <label for="name" class="form-label, label-add-event">Game Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
                         <input type="text" name="name" class="form-control, input-add-event" id="name" placeholder="Enter game name here...">
@@ -61,7 +61,7 @@
                     </div>
                     <br><br>
                     <div class="mb-3">
-                        <input type="submit" class="btn-add-event" value="Add Event" name="btnAddEv">
+                        <input type="submit" class="btn-add-event" value="Add Game" name="btnAddEv">
                     </div>      
                 </form>
             </div>

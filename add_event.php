@@ -46,7 +46,7 @@
             <div class="content-title">
                 <h1 class="h1-content-title">Adding Event</h1>
             </div>
-            <div class="content-submenu-event">     
+            <div class="content-submenu-page">     
                 <form action="add_event_proses.php" method="POST">
                     <div class="mb-3">
                         <label for="name" class="form-label, label-add-event">Event Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>

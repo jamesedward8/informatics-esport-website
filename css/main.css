@@ -93,14 +93,14 @@ tr, th, td {
     z-index: -1;
 }
 
-.content-event {
+.content-page {
     display: flex;
     justify-content: center;
     align-items: center;
     margin-top: 30px;
 }
 
-.content-submenu-event {
+.content-submenu-page {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -206,6 +206,25 @@ tr, th, td {
     width: 150px;
     height: 40px;
     margin: 20px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    background-color: orange;
+    color: white;
+    border: none;
+    border-radius: 10px;
+}
+
+.cmb-choose-game {
+    padding: 10px;
+    margin-left: 15px; 
+}
+
+.btn-add-team {
+    width: 150px;
+    height: 40px;
+    margin: 50px auto;
     display: flex;
     justify-content: center;
     align-items: center;

@@ -52,7 +52,7 @@ $user = "admin";
                     <input type="submit" class="btn-add-ev" value="Add" name="btnAdd">
                 </form>
             </div>
-            <div class="content-event">
+            <div class="content-page">
                 <?php
                     $stmt = $mysqli->prepare("SELECT * FROM event");
                     $stmt->execute();

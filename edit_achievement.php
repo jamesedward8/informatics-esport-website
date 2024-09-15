@@ -72,7 +72,7 @@
             <div class="content-title">
                 <h1 class="h1-content-title">Edit Achievement</h1>
             </div>
-            <div class="content-event">     
+            <div class="content-page">     
                 <?php
                     if (isset($_GET['idachievement']) && $_GET['idachievement'] != null) {
                         $idachievement = $_GET['idachievement'];

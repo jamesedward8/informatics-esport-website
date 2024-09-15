@@ -46,9 +46,9 @@
             <div class="content-title">
                 <h1 class="h1-content-title">Adding Team</h1>
             </div>
-            <div class="content-event">     
+            <div class="content-page">     
                 <form action="add_team_proses.php" method="POST">
-                    <br><br><br><br><br><br><br><br><br><br><br><br>
+                    <br><br><br><br><br><br>
                     <div class="mb-3">
                         <label for="name" class="form-label, label-add-event">Team Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
                         <input type="text" name="name" class="form-control, input-add-event" id="name" placeholder="Enter team name here...">
@@ -63,7 +63,7 @@
                                 $stmt->execute();
                                 $res = $stmt->get_result();
                                 ?>
-                        <select name="idgame" id="idgame">
+                        <select class="cmb-choose-game" name="idgame" id="idgame">
                         <option value="">Pilih Game</option>
                         <?php
                             while($row = $res->fetch_assoc()) {
@@ -76,7 +76,7 @@
                     <br><br>
                     
                     <div class="mb-3">
-                        <input type="submit" class="btn-add-event" value="Add Event" name="btnAddEv">
+                        <input type="submit" class="btn-add-team" value="Add Team" name="btnAddEv">
                     </div>      
                 </form>
             </div>

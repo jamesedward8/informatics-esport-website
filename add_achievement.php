@@ -65,7 +65,7 @@
             <div class="content-title">
                 <h1 class="h1-content-title">Adding Acheivement</h1>
             </div>
-            <div class="content-event">     
+            <div class="content-submenu-page">     
                 <form action="add_achievement_proses.php" method="POST">
                     <br><br><br><br><br><br><br><br><br><br><br><br>
                     <div class="mb-3">

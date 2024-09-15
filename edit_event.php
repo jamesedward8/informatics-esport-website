@@ -47,7 +47,7 @@
             <div class="content-title">
                 <h1 class="h1-content-title">Editing Event</h1>
             </div>
-            <div class="content-submenu-event">     
+            <div class="content-submenu-page">     
             <?php
                 if (isset($_GET['idevent'])) {
                     if ($_GET['idevent'] != null) {

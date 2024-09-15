@@ -52,7 +52,7 @@ $user = "admin";
                     <input type="submit" class="btn-add-ev" value="Add" name="btnAdd">
                 </form>
             </div>
-            <div class="content-event">
+            <div class="content-page">
                 <?php
                     //! SELECT event query
                     $stmt = $mysqli->prepare("SELECT t.name as namateam, g.name as namagame, t.idteam FROM team t JOIN game g ON t.idgame = g.idgame");

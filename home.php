@@ -53,7 +53,7 @@ $user = "admin";
                     <input type="submit" class="btn-add-ev" value="Add" name="btnAdd">
                 </form> 
             </div>
-            <div class="content-event">
+            <div class="content-page">
                 <?php
                     $stmt = $mysqli->prepare("SELECT a.name as achievement_name, t.name as team_name, a.date, a.description, g.idgame, g.name as game_name, a.idachievement FROM achievement a JOIN team t ON a.idteam = t.idteam JOIN game g ON t.idgame = g.idgame");
                     $stmt->execute();
