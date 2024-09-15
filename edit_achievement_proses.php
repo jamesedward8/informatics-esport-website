@@ -8,6 +8,8 @@
     else {
         echo "Database connection succeed!";
         echo "<br>";
+    }
+    
     $user = "admin";
 
     if (isset($_POST['btnEditEv'])) {
