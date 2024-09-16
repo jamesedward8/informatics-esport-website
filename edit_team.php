@@ -5,12 +5,6 @@
         echo "Failed to connect to MySQL: " . $mysqli->connect_error;
         exit();
     }
-
-    else {
-        echo "Database connection succeed!";
-        echo "<br>";
-    }
-
     $user = "admin";
 ?>
 
@@ -20,28 +14,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/main.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inria+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
     <title>Edit Team</title>
 </head>
 <body>
-    <header class="header">
-        <div class="overlay" data-overlay></div>
-        <div class="containerLogo">
-            <img src="img/logo.png" alt="logo" class="logo">
-        </div>
-        <div class="nav">
-            <div class="nav-kiri">
-                <a href="home.php" <?php echo "style = 'display:".(($user=="admin")?"yes":"none")."';"?>><nav class="navbar">Home</nav></a>
-                <a href="event.php" <?php echo "style = 'display:yes';" ?>><nav class="navbar">Event</nav></a>
-                <a href="game.php" <?php echo "style = 'display:yes';" ?>><nav class="navbar">Division</nav></a>
-                <a href="team.php" <?php echo "style = 'display:yes';" ?>><nav class="navbar">Team</nav></a>
-                <a href="recruitment.php" <?php echo "style = 'display:yes';" ?>><nav class="navbar">Recruitment</nav></a>
-                <a href="manage.php" <?php echo "style = 'display:yes';" ?>><nav class="navbar">Manage</nav></a> 
-            </div>
-            <div class="nav-kanan">
-                <button>Login</button>
-            </div>
-        </div>
-    </header>
+    <?php  
+        include('header.php');
+    ?>
     <main class="content">
         <article>
             <div class="content-title">
@@ -63,7 +44,6 @@
             ?>
 
             <form action="edit_team_proses.php" method="POST">
-                <br><br><br><br><br><br><br><br><br><br><br><br>
                 <input type="hidden" name="idteam" value="<?php echo $team['idteam'] ?>">
                 <div class="mb-3">
                     <label for="name" class="form-label, label-edit-event">Team Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>

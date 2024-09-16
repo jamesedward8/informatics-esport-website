@@ -6,10 +6,6 @@
         exit();
     }
 
-    else {
-        echo "Database connection succeed!";
-        echo "<br>";
-    }
 
     $user = "admin";
 

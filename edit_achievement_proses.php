@@ -5,10 +5,6 @@
         echo "Failed to connect to MySQL: " . $mysqli->connect_error;
         exit();
     }
-    else {
-        echo "Database connection succeed!";
-        echo "<br>";
-    }
     
     $user = "admin";
 

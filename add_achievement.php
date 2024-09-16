@@ -5,11 +5,6 @@
         echo "Failed to connect to MySQL: " . $mysqli->connect_error;
         exit();
     }
-
-    else {
-        echo "Database connection succeed!";
-    }
-
     $user = "admin";
 ?>
 
@@ -19,6 +14,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/main.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inria+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
     <title>Add Team</title>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
@@ -41,25 +39,9 @@
     </script>
 </head>
 <body>
-    <header class="header">
-        <div class="overlay" data-overlay></div>
-        <div class="containerLogo">
-            <img src="img/logo.png" alt="logo" class="logo">
-        </div>
-        <div class="nav">
-            <div class="nav-kiri">
-                <a href="home.php" <?php echo "style = 'display:".(($user=="admin")?"yes":"none")."';"?>><nav class="navbar">Home</nav></a>
-                <a href="event.php" <?php echo "style = 'display:yes';" ?>><nav class="navbar">Event</nav></a>
-                <a href="game.php" <?php echo "style = 'display:yes';" ?>><nav class="navbar">Division</nav></a>
-                <a href="team.php" <?php echo "style = 'display:yes';" ?>><nav class="navbar">Team</nav></a>
-                <a href="recruitment.php" <?php echo "style = 'display:yes';" ?>><nav class="navbar">Recruitment</nav></a>
-                <a href="manage.php" <?php echo "style = 'display:yes';" ?>><nav class="navbar">Manage</nav></a>  
-            </div>
-            <div class="nav-kanan">
-                <button>Login</button>
-            </div>
-        </div>
-    </header>
+    <?php  
+        include('header.php');
+    ?>
     <main class="content">
         <article>
             <div class="content-title">
@@ -67,7 +49,6 @@
             </div>
             <div class="content-submenu-page">     
                 <form action="add_achievement_proses.php" method="POST">
-                    <br><br><br><br><br><br><br><br><br><br><br><br>
                     <div class="mb-3">
                         <label for="name" class="form-label, label-add-event">Achievement Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
                         <input type="text" name="name" class="form-control, input-add-event" id="name" placeholder="Enter achievement here...">
@@ -135,6 +116,7 @@
             $mysqli->close();
         ?>
     </main>
+    
 </body>
 </html>
 

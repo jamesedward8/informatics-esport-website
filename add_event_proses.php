@@ -6,10 +6,6 @@
         exit();
     }
 
-    else {
-        echo "Database connection succeed!";
-    }
-
     $user = "admin";
 
     if (isset($_POST['btnAddEv'])) {
