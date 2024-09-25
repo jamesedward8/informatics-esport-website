@@ -29,7 +29,52 @@ $user = "admin";
     <main class="content">
         <article>
             <div class="content-title">
-                <h1 class="h1-content-title">- To be Continued -</h1>
+                <h1 class="h1-content-title">Managing team</h1>
+            </div>
+            <div class="content-page">
+                <?php
+                    $stmt = $mysqli->prepare("SELECT * FROM event");
+                    $stmt->execute();
+                    $res = $stmt->get_result();
+
+                    echo "<br><br>";
+
+                    echo "<table class='tableEvent'>";
+                    echo "<thead>";
+                    echo "<tr>
+                            <th>Event Name</th>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th colspan=2>Action</th>
+                        </tr>";
+                    echo "</thead>";
+
+                    echo "<tbody>";
+
+                    if ($res->num_rows == 0) {
+                        echo "<tr>
+                                <td colspan='4'>No Event Available, Stay Tuned!</td>
+                            </tr>";
+                    }
+
+                    else {
+                        while ($row = $res->fetch_assoc()) {
+                            $date = new DateTime($row['date']);
+                            $formatDate = $date->format('d F Y');
+
+                            echo "<tr>
+                                    <td>" . $row['name'] . "</td>
+                                    <td>" . $formatDate . "</td>
+                                    <td>" . $row['description'] . "</td>
+                                    <td><a class='ad-event-team-edit' href='join_event.php?idevent=". $row['idevent'] ."' 'style = 'display:".(($user=="admin")?"yes":"none")."';>Tambah Team</a></td>
+                                </tr>";  
+                        }
+                    }
+
+                    echo "</tbody>";
+
+                    echo "</table>";
+                ?>
             </div>
         </article>
     </main>
