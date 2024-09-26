@@ -224,11 +224,10 @@ td {
     margin: 50px auto;
 }
 
-.td-event-edit {
+.td-event-edit{
     color: greenyellow;
     text-align: center;
 }
-
 .label-edit-event,
 .label-add-event {
     color: orange;

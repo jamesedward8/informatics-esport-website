@@ -66,7 +66,7 @@ $user = "admin";
                                     <td>" . $row['name'] . "</td>
                                     <td>" . $formatDate . "</td>
                                     <td>" . $row['description'] . "</td>
-                                    <td><a class='ad-event-team-edit' href='join_event.php?idevent=". $row['idevent'] ."' 'style = 'display:".(($user=="admin")?"yes":"none")."';>Tambah Team</a></td>
+                                    <td><a class='td-event-edit' href='join_event.php?idevent=". $row['idevent'] ."' 'style = 'display:".(($user=="admin")?"yes":"none")."';>Tambah Team</a></td>
                                 </tr>";  
                         }
                     }
