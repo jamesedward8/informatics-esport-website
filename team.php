@@ -1,13 +1,23 @@
 <?php 
-$mysqli = new mysqli ("localhost", "root", "", "esport");
+$mysqli = new mysqli("localhost", "root", "", "esport");
 
 if ($mysqli->connect_errno) {
     echo "Failed to connect to MySQL: " . $mysqli->connect_error;
     exit();
 }
 
-
 $user = "admin";
+
+// Pagination setup
+$limit = 3; // Number of records per page
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1; // Get current page number
+$offset = ($page - 1) * $limit; // Calculate offset for SQL query
+
+// Get total number of teams
+$resultTotal = $mysqli->query("SELECT COUNT(*) AS total FROM team");
+$rowTotal = $resultTotal->fetch_assoc();
+$totalData = $rowTotal['total'];
+$totalPages = ceil($totalData / $limit); // Calculate total pages
 ?>
 
 <!DOCTYPE html>
@@ -38,8 +48,12 @@ $user = "admin";
             </div>
             <div class="content-page">
                 <?php
-                    //! SELECT event query
-                    $stmt = $mysqli->prepare("SELECT t.name as namateam, g.name as namagame, t.idteam FROM team t JOIN game g ON t.idgame = g.idgame");
+                    // SELECT team query with LIMIT and OFFSET
+                    $stmt = $mysqli->prepare("SELECT t.name as namateam, g.name as namagame, t.idteam 
+                                               FROM team t 
+                                               JOIN game g ON t.idgame = g.idgame 
+                                               LIMIT ? OFFSET ?");
+                    $stmt->bind_param('ii', $limit, $offset); // Bind parameters
                     $stmt->execute();
                     $res = $stmt->get_result();
 
@@ -60,21 +74,27 @@ $user = "admin";
                         echo "<tr>
                                 <td colspan='5'>No Team Available, Stay Tuned!</td>
                             </tr>";
-                    }
-
-                    else {
+                    } else {
                         while ($row = $res->fetch_assoc()) {
                             echo "<tr>
                                     <td>" . $row['namateam'] . "</td>
                                     <td>" . $row['namagame'] . "</td>
-                                    <td><a class='td-event-edit' href='edit_team.php?idteam=". $row['idteam'] ."' 'style = 'display:".(($user=="admin")?"yes":"none")."';>Edit</a></td>
-                                    <td><a class='td-event-delete' href='delete_team.php?idteam=". $row['idteam'] ."' 'style = 'display:".(($user=="admin")?"yes":"none")."';>Delete</a></td>
+                                    <td><a class='td-event-edit' href='edit_team.php?idteam=". $row['idteam'] ."' style='display:".(($user=="admin")?"block":"none").";'>Edit</a></td>
+                                    <td><a class='td-event-delete' href='delete_team.php?idteam=". $row['idteam'] ."' style='display:".(($user=="admin")?"block":"none").";'>Delete</a></td>
                                 </tr>";  
                         }
                     }
 
                     echo "</tbody>";
                     echo "</table>";
+                ?>
+            </div>
+            <div class="pagination">
+                <?php
+                // Loop to display page numbers
+                for ($i = 1; $i <= $totalPages; $i++) {
+                    echo "<a href='?page=$i' class='page-btn " . (($i == $page) ? 'active' : '') . "'>$i &nbsp; &nbsp; </a>";
+                }
                 ?>
             </div>
         </article>

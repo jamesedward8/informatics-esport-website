@@ -1,13 +1,23 @@
 <?php 
-$mysqli = new mysqli ("localhost", "root", "", "esport");
+$mysqli = new mysqli("localhost", "root", "", "esport");
 
 if ($mysqli->connect_errno) {
     echo "Failed to connect to MySQL: " . $mysqli->connect_error;
     exit();
 }
 
-
 $user = "admin";
+
+// Pagination setup
+$limit = 3; // Number of records per page
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1; // Get current page number
+$offset = ($page - 1) * $limit; // Calculate offset for SQL query
+
+// Get total number of games
+$resultTotal = $mysqli->query("SELECT COUNT(*) AS total FROM game");
+$rowTotal = $resultTotal->fetch_assoc();
+$totalData = $rowTotal['total'];
+$totalPages = ceil($totalData / $limit); // Calculate total pages
 ?>
 
 <!DOCTYPE html>
@@ -38,7 +48,9 @@ $user = "admin";
             </div>
             <div class="content-page">
                 <?php
-                    $stmt = $mysqli->prepare("SELECT * FROM game");
+                    // SELECT game query with LIMIT and OFFSET
+                    $stmt = $mysqli->prepare("SELECT * FROM game LIMIT ? OFFSET ?");
+                    $stmt->bind_param('ii', $limit, $offset); // Bind parameters
                     $stmt->execute();
                     $res = $stmt->get_result();
 
@@ -59,16 +71,13 @@ $user = "admin";
                         echo "<tr>
                                 <td colspan='3'>No Game Available, Stay Tuned!</td>
                             </tr>";
-                    }
-
-                    else {
+                    } else {
                         while ($row = $res->fetch_assoc()) {
-
                             echo "<tr>
                                     <td>" . $row['name'] . "</td>
                                     <td>" . $row['description'] . "</td>
-                                    <td><a class='td-event-edit' href='edit_game.php?idgame=". $row['idgame'] ."' 'style = 'display:".(($user=="admin")?"yes":"none")."';>Edit</a></td>
-                                    <td><a class='td-event-delete' href='delete_game.php?idgame=". $row['idgame'] ."' 'style = 'display:".(($user=="admin")?"yes":"none")."';>Delete</a></td>
+                                    <td><a class='td-event-edit' href='edit_game.php?idgame=". $row['idgame'] ."' style='display:".(($user=="admin")?"block":"none").";'>Edit</a></td>
+                                    <td><a class='td-event-delete' href='delete_game.php?idgame=". $row['idgame'] ."' style='display:".(($user=="admin")?"block":"none").";'>Delete</a></td>
                                 </tr>";  
                         }
                     }
@@ -78,10 +87,18 @@ $user = "admin";
                     echo "</table>";
                 ?>
             </div>
+            <div class="pagination">
+                <?php
+                // Loop to display page numbers
+                for ($i = 1; $i <= $totalPages; $i++) {
+                    echo "<a href='?page=$i' class='page-btn " . (($i == $page) ? 'active' : '') . "'>$i &nbsp; &nbsp; </a>";
+                }
+                ?>
+            </div>
         </article>
     </main>
     <?php  
-        include ('footer.php');
+        include('footer.php');
     ?>
 </body>
 </html>
