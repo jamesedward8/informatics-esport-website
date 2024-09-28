@@ -380,9 +380,30 @@ td {
         justify-content: center;
     }
 }
-
-.pagination{
-    background-color: aqua;
+.pagination {
+    display: flex; 
+    justify-content: center;
+    margin-top: 20px; 
 }
 
+.page-btn {
+    background-color: transparent; 
+    color: orange; 
+    padding: 10px 15px; 
+    margin: 0 5px; 
+    border: 2px solid orange; 
+    border-radius: 5px; 
+    text-decoration: none; 
+    transition: background-color 0.3s; 
+}
+
+.page-btn:hover {
+    background-color: orange; 
+    color: white; 
+}
+
+.page-btn.active {
+    background-color: orange; 
+    color: white; 
+}
 
