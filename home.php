@@ -1,4 +1,5 @@
 <?php
+session_start();    
 $mysqli = new mysqli("localhost", "root", "", "esport");
 
 if ($mysqli->connect_errno) {
@@ -8,16 +9,14 @@ if ($mysqli->connect_errno) {
 
 $user = "admin";
 
-// Pagination setup
-$limit = 3; // Number of records per page
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1; // Get current page number
-$offset = ($page - 1) * $limit; // Calculate offset for SQL query
+$limit = 3; 
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1; 
+$offset = ($page - 1) * $limit; 
 
-// Get total number of records
 $resultTotal = $mysqli->query("SELECT COUNT(*) AS total FROM achievement");
 $rowTotal = $resultTotal->fetch_assoc();
 $totalData = $rowTotal['total'];
-$totalPages = ceil($totalData / $limit); // Calculate total pages
+$totalPages = ceil($totalData / $limit);
 ?>
 
 <!DOCTYPE html>
@@ -54,13 +53,12 @@ $totalPages = ceil($totalData / $limit); // Calculate total pages
             </div>
             <div class="content-page">
                 <?php
-                    // Modify the SQL query to include LIMIT and OFFSET
                     $stmt = $mysqli->prepare("SELECT a.name as achievement_name, t.name as team_name, a.date, a.description, g.idgame, g.name as game_name, a.idachievement 
                                                FROM achievement a 
                                                JOIN team t ON a.idteam = t.idteam 
                                                JOIN game g ON t.idgame = g.idgame 
                                                LIMIT ? OFFSET ?");
-                    $stmt->bind_param('ii', $limit, $offset); // Bind parameters
+                    $stmt->bind_param('ii', $limit, $offset); 
                     $stmt->execute();
                     $res = $stmt->get_result();
 
@@ -105,9 +103,8 @@ $totalPages = ceil($totalData / $limit); // Calculate total pages
 
             <div class="pagination">
                 <?php
-                // Loop for pagination links
                 for ($i = 1; $i <= $totalPages; $i++) {
-                    echo "<a href='?page=$i' class='page-btn " . (($i == $page) ? 'active' : '') . "'>$i &nbsp; &nbsp; </a>";
+                    echo "<a href='?page=$i' class='page-btn " . (($i == $page) ? 'active' : '') . "'>$i</a>";
                 }
                 ?>
             </div>

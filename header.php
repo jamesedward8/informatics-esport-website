@@ -1,5 +1,4 @@
 <?php 
-// header.php
 $mysqli = new mysqli("localhost", "root", "", "esport");
 
 if ($mysqli->connect_errno) {
@@ -8,13 +7,13 @@ if ($mysqli->connect_errno) {
 }
 
 $user = "admin"; 
+$username = isset($_SESSION['username']) ? $_SESSION['username'] : null; 
 ?>
-
 <header class="header">
     <div class="containerLogo">
         <img src="img/logo.png" alt="logo" class="logo">
     </div>
-    <div class="nav">
+    <div class="nav">   
         <div class="nav-kiri">
             <a href="home.php" <?php echo "style = 'display:".(($user=="admin")?"yes":"none")."';"?>><nav class="navbar">HOME</nav></a>
             <a href="event.php" <?php echo "style = 'display:yes';" ?>><nav class="navbar">EVENT</nav></a>
@@ -24,7 +23,12 @@ $user = "admin";
             <a href="manage.php" <?php echo "style = 'display:yes';" ?>><nav class="navbar">MANAGE</nav></a> 
         </div>
         <div class="nav-kanan">
-            <button class="btn-login">LOGIN</button>
+            <?php if ($username): ?>
+                <!-- <a href='profile.php'>Hi, <?php echo ($username); ?>!</> -->
+                <a href="logout.php">LOGOUT</a>
+            <?php else: ?>
+                <button class="btn-login" onclick="window.location.href='login.php';">LOGIN</button>
+            <?php endif; ?>
         </div>
     </div>
 </header>

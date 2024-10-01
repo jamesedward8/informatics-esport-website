@@ -11,6 +11,7 @@ $user = "admin";
 $limit = 3;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
+
 $resultTotal = $mysqli->query("SELECT COUNT(*) AS total FROM event");
 $rowTotal = $resultTotal->fetch_assoc();
 $totalData = $rowTotal['total'];
@@ -46,7 +47,6 @@ $totalPages = ceil($totalData / $limit);
             </div>
             <div class="content-page">
                 <?php
-                // Query data dengan LIMIT dan OFFSET
                 $stmt = $mysqli->prepare("SELECT * FROM event LIMIT ? OFFSET ?");
                 $stmt->bind_param('ii', $limit, $offset);
                 $stmt->execute();
@@ -93,9 +93,8 @@ $totalPages = ceil($totalData / $limit);
 
             <div class="pagination">
                 <?php
-                // Loop untuk menampilkan nomor halaman
                 for ($i = 1; $i <= $totalPages; $i++) {
-                    echo "<a href='?page=$i' class='page-btn " . (($i == $page) ? 'active' : '    ') . "'>$i &nbsp; &nbsp; </a>";
+                    echo "<a href='?page=$i' class='page-btn " . (($i == $page) ? 'active' : '    ') . "'>$i</a>";
                 }
                 ?>
             </div>
@@ -105,5 +104,4 @@ $totalPages = ceil($totalData / $limit);
     include('footer.php');
     ?>
 </body>
-
 </html>
