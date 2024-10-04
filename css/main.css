@@ -196,7 +196,7 @@ td {
     align-items: center;
     font-size: 20px;
     background-color: orange;
-    color: black;
+    color: white;
     border: none;
     border-radius: 10px;
     font-family: "Inria Sans", sans-serif;
@@ -226,7 +226,7 @@ td {
     margin: 50px auto;
 }
 
-.td-event-edit {
+.td-btn-edit {
     color: greenyellow;
     text-align: center;
 }
@@ -260,7 +260,7 @@ td {
     margin: 10px 30px 20px;
 }
 
-.td-event-delete {
+.td-btn-delete {
     color: red;
     text-align: center;
 }

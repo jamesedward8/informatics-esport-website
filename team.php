@@ -1,4 +1,5 @@
 <?php 
+session_start();
 $mysqli = new mysqli("localhost", "root", "", "esport");
 
 if ($mysqli->connect_errno) {
@@ -6,7 +7,9 @@ if ($mysqli->connect_errno) {
     exit();
 }
 
-$user = "admin";
+$role = isset($_SESSION['profile']) ? $_SESSION['profile'] : null;
+$user = isset($_SESSION['username']) ? $_SESSION['username'] : null; 
+$iduser = isset($_SESSION['idmember']) ? $_SESSION['idmember'] : null;
 
 $limit = 3; 
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1; 
@@ -41,7 +44,18 @@ $totalPages = ceil($totalData / $limit);
             </div>
             <div class="side-content-event">
                 <form action="add_team.php" method="POST">
-                    <input type="submit" class="btn-add-ev" value="ADD" name="btnAdd">
+                    <?php 
+                        if ($role == "admin") {
+                            echo "<input type='submit' class='btn-add-ev' value='ADD' name='btnAdd'>";
+                        }
+                    ?>
+                </form>
+                <form action="join_team_status.php">
+                    <?php 
+                        if ($role == "member") {
+                            echo "<input type='submit' class='btn-add-event' name='btn-check' value='Proposal Status'>";
+                        }
+                    ?>
                 </form>
             </div>
             <div class="content-page">
@@ -57,32 +71,51 @@ $totalPages = ceil($totalData / $limit);
                     echo "<br><br>";
 
                     echo "<table class='tableEvent'>";
-                    echo "<thead>";
-                    echo "<tr>
-                            <th>Team Name</th>
-                            <th>Game Name</th>
-                            <th colspan=2>Action</th>
-                        </tr>";
-                    echo "</thead>";
+                        echo "<thead>";
+                            if ($role == "admin") {
+                                echo "<tr>
+                                        <th>Team Name</th>
+                                        <th>Game Name</th>
+                                        <th colspan=2>Action</th>
+                                    </tr>";
+                            } else {
+                                echo "<tr>
+                                        <th>Team Name</th>
+                                        <th>Game Name</th>
+                                        <th>Action</th>
+                                    </tr>";
+                            }
+                        echo "</thead>";
 
-                    echo "<tbody>";
+                        echo "<tbody>";
 
-                    if ($res->num_rows == 0) {
-                        echo "<tr>
-                                <td colspan='5'>No Team Available, Stay Tuned!</td>
-                            </tr>";
-                    } else {
-                        while ($row = $res->fetch_assoc()) {
+                        if ($res->num_rows == 0) {
                             echo "<tr>
-                                    <td>" . $row['namateam'] . "</td>
-                                    <td>" . $row['namagame'] . "</td>
-                                    <td><a class='td-event-edit' href='edit_team.php?idteam=". $row['idteam'] ."' style='display:".(($user=="admin")?"block":"none").";'>Edit</a></td>
-                                    <td><a class='td-event-delete' href='delete_team.php?idteam=". $row['idteam'] ."' style='display:".(($user=="admin")?"block":"none").";'>Delete</a></td>
-                                </tr>";  
+                                    <td colspan='5'>No Team Available, Stay Tuned!</td>
+                                </tr>";
+                        } else {
+                            while ($row = $res->fetch_assoc()) {
+                                if ($role == "admin") {
+                                    echo "<tr>
+                                            <td>" . $row['namateam'] . "</td>
+                                            <td>" . $row['namagame'] . "</td>
+                                            <td><a class='td-btn-edit' href='edit_team.php?idteam=". $row['idteam'] ."' style='display:".(($role=="admin")?"block":"none").";'>Edit</a></td>
+                                            <td><a class='td-btn-delete' href='delete_team.php?idteam=". $row['idteam'] ."' style='display:".(($role=="admin")?"block":"none").";'>Delete</a></td>
+                                        </tr>";  
+                                } 
+                                
+                                else {
+                                    echo "<tr>
+                                            <td>" . $row['namateam'] . "</td>
+                                            <td>" . $row['namagame'] . "</td>
+                                            <td><a class='td-btn-edit' href='join_team.php?idteam=". $row['idteam'] ."&idmember=". $iduser ."' style='display:".(($role=="member")?"block":"none").";' name='btn-Join'>Join</a></td>
+                                        </tr>";  
+                                }
+                            }
                         }
-                    }
 
-                    echo "</tbody>";
+                        echo "</tbody>";
+
                     echo "</table>";
                 ?>
             </div>

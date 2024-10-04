@@ -1,4 +1,5 @@
 <?php
+session_start();
 $mysqli = new mysqli("localhost", "root", "", "esport");
 
 if ($mysqli->connect_errno) {
@@ -6,7 +7,8 @@ if ($mysqli->connect_errno) {
     exit();
 }
 
-$user = "admin";
+$role = isset($_SESSION['profile']) ? $_SESSION['profile'] : null;
+$user = isset($_SESSION['username']) ? $_SESSION['username'] : null; 
 
 $limit = 3;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -33,7 +35,7 @@ $totalPages = ceil($totalData / $limit);
 
 <body>
     <?php
-    include('header.php');
+        include('header.php');
     ?>
     <main class="content">
         <article>
@@ -42,7 +44,11 @@ $totalPages = ceil($totalData / $limit);
             </div>
             <div class="side-content-event">
                 <form action="add_event.php" method="POST">
-                    <input type="submit" class="btn-add-ev" value="ADD" name="btnAdd">
+                    <?php 
+                        if ($role == "admin") {
+                            echo "<input type='submit' class='btn-add-ev' value='ADD' name='btnAdd'>";
+                        }
+                    ?>
                 </form>
             </div>
             <div class="content-page">
@@ -55,38 +61,54 @@ $totalPages = ceil($totalData / $limit);
                 echo "<br><br>";
 
                 echo "<table class='tableEvent'>";
-                echo "<thead>";
-                echo "<tr>
-                            <th>Event Name</th>
-                            <th>Date</th>
-                            <th>Description</th>
-                            <th colspan=2>Action</th>
-                        </tr>";
-                echo "</thead>";
+                    echo "<thead>";
+                        if ($role == "admin") {
+                            echo "<tr>
+                                    <th>Event Name</th>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th colspan=2>Action</th>
+                                </tr>";
+                        } else {
+                            echo "<tr>
+                                    <th>Event Name</th>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                </tr>";
+                        }
+                    echo "</thead>";
 
-                echo "<tbody>";
+                    echo "<tbody>";
 
-                if ($res->num_rows == 0) {
-                    echo "<tr>
+                    if ($res->num_rows == 0) {
+                        echo "<tr>
                                 <td colspan='4'>No Event Available, Stay Tuned!</td>
                             </tr>";
-                } else {
-                    while ($row = $res->fetch_assoc()) {
-                        $date = new DateTime($row['date']);
-                        $formatDate = $date->format('d F Y');
+                    } else {
+                        while ($row = $res->fetch_assoc()) {
+                            $date = new DateTime($row['date']);
+                            $formatDate = $date->format('d F Y');
 
-                        echo "<tr>
-                                    <td>" . $row['name'] . "</td>
-                                    <td>" . $formatDate . "</td>
-                                    <td>" . $row['description'] . "</td>
-                                    <td><a class='td-event-edit' href='edit_event.php?idevent=" . $row['idevent'] . "' style='display:" . (($user == "admin") ? "yes" : "none") . "'>Edit</a></td>
-                                    <td><a class='td-event-delete' href='delete_event.php?idevent=" . $row['idevent'] . "' style='display:" . (($user == "admin") ? "yes" : "none") . "'>Delete</a></td>
-                                </tr>";
+                            if ($role == "admin") {
+                                echo "<tr>
+                                        <td>" . $row['name'] . "</td>
+                                        <td>" . $formatDate . "</td>
+                                        <td>" . $row['description'] . "</td>
+                                        <td><a class='td-btn-edit' href='edit_event.php?idevent=" . $row['idevent'] . "' style='display:" . (($role == "admin") ? "yes" : "none") . "'>Edit</a></td>
+                                        <td><a class='td-btn-delete' href='delete_event.php?idevent=" . $row['idevent'] . "' style='display:" . (($role == "admin") ? "yes" : "none") . "'>Delete</a></td>
+                                    </tr>";
+                            } else {
+                                echo "<tr>
+                                        <td>" . $row['name'] . "</td>
+                                        <td>" . $formatDate . "</td>
+                                        <td>" . $row['description'] . "</td>
+                                    </tr>";
+                            }
+                        }
                     }
-                }
+                    echo "</tbody>";
 
-                echo "</tbody>";
-                echo "</table>";
+                    echo "</table>";
                 ?>
 
             </div>

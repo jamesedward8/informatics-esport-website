@@ -1,5 +1,5 @@
 <?php
-session_start();    
+session_start();  
 $mysqli = new mysqli("localhost", "root", "", "esport");
 
 if ($mysqli->connect_errno) {
@@ -7,7 +7,8 @@ if ($mysqli->connect_errno) {
     exit();
 }
 
-$user = "admin";
+$role = isset($_SESSION['profile']) ? $_SESSION['profile'] : null;
+$user = isset($_SESSION['username']) ? $_SESSION['username'] : null;
 
 $limit = 3; 
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1; 
@@ -48,7 +49,11 @@ $totalPages = ceil($totalData / $limit);
             </div>
             <div class="side-content-event">
                 <form action="add_achievement.php" method="POST">
-                    <input type="submit" class="btn-add-ev" value="ADD" name="btnAdd">
+                    <?php
+                        if ($role == "admin") {
+                            echo "<input type='submit' class='btn-add-ev' value='ADD' name='btnAdd'>";
+                        }
+                    ?>
                 </form> 
             </div>
             <div class="content-page">
@@ -65,38 +70,60 @@ $totalPages = ceil($totalData / $limit);
                     echo "<br><br>";
 
                     echo "<table class='tableEvent'>";
-                    echo "<thead>";
-                    echo "<tr>
-                            <th>Achievement Name</th>
-                            <th>Game Name</th>
-                            <th>Team Name</th>
-                            <th>Date</th>
-                            <th>Description</th>
-                            <th colspan=2>Action</th>
-                        </tr>";
-                    echo "</thead>";
+                        echo "<thead>";
 
-                    echo "<tbody>";
+                        if ($role == "admin") {
+                            echo "<tr>
+                                    <th>Achievement Name</th>
+                                    <th>Game Name</th>
+                                    <th>Team Name</th>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th colspan=2>Action</th>
+                                </tr>";
+                        } else {
+                            echo "<tr>
+                                    <th>Achievement Name</th>
+                                    <th>Game Name</th>
+                                    <th>Team Name</th>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                </tr>";
+                        }
+                    
+                        echo "</thead>";
+
+                        echo "<tbody>";
 
                     if ($res->num_rows == 0) {
-                        echo "<tr>
-                                <td colspan='6'>No Achievement Available, Stay Tuned!</td>
-                            </tr>";
+                            echo "<tr>
+                                    <td colspan='6'>No Achievement Available, Stay Tuned!</td>
+                                </tr>";
                     } else {
                         while ($row = $res->fetch_assoc()) {
-                            echo "<tr>
-                                    <td>" . $row['achievement_name'] . "</td>
-                                    <td>" . $row['game_name'] . "</td>
-                                    <td>" . $row['team_name'] . "</td>
-                                    <td>" . $row['date'] . "</td>
-                                    <td>" . $row['description'] . "</td>
-                                    <td><a class='td-event-edit' href='edit_achievement.php?idachievement=". $row['idachievement'] ."' style='display:".(($user=="admin")?"block":"none").";'>Edit</a></td>
-                                    <td><a class='td-event-delete' href='delete_achievement.php?idachievement=". $row['idachievement'] ."' style='display:".(($user=="admin")?"block":"none").";'>Delete</a></td>
-                                </tr>";  
-                        }
-                    }
 
-                    echo "</tbody>";
+                                if ($role == "admin") {
+                                    echo "<tr>
+                                            <td>" . $row['achievement_name'] . "</td>
+                                            <td>" . $row['game_name'] . "</td>
+                                            <td>" . $row['team_name'] . "</td>
+                                            <td>" . $row['date'] . "</td>
+                                            <td>" . $row['description'] . "</td>
+                                            <td><a class='td-btn-edit' href='edit_achievement.php?idachievement=". $row['idachievement'] ."' style='display:".(($role=="admin")?"block":"none").";'>Edit</a></td>
+                                            <td><a class='td-btn-delete' href='delete_achievement.php?idachievement=". $row['idachievement'] ."' style='display:".(($role=="admin")?"block":"none").";'>Delete</a></td>
+                                        </tr>";  
+                                } else {
+                                    echo "<tr>
+                                            <td>" . $row['achievement_name'] . "</td>
+                                            <td>" . $row['game_name'] . "</td>
+                                            <td>" . $row['team_name'] . "</td>
+                                            <td>" . $row['date'] . "</td>
+                                            <td>" . $row['description'] . "</td>
+                                        </tr>";
+                                }
+                            }
+                        }
+                        echo "</tbody>";
                     echo "</table>";
                 ?>
             </div>

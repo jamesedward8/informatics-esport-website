@@ -1,4 +1,5 @@
 <?php 
+session_start();
 $mysqli = new mysqli("localhost", "root", "", "esport");
 
 if ($mysqli->connect_errno) {
@@ -6,7 +7,8 @@ if ($mysqli->connect_errno) {
     exit();
 }
 
-$user = "admin";
+$role = isset($_SESSION['profile']) ? $_SESSION['profile'] : null;
+$user = isset($_SESSION['username']) ? $_SESSION['username'] : null; 
 
 $limit = 3; 
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1; 
@@ -41,7 +43,11 @@ $totalPages = ceil($totalData / $limit);
             </div>
             <div class="side-content-event">
                 <form action="add_game.php" method="POST">
-                    <input type="submit" class="btn-add-ev" value="ADD" name="btnAdd">
+                    <?php 
+                        if ($role == "admin") {
+                            echo "<input type='submit' class='btn-add-ev' value='ADD' name='btnAdd'>";
+                        }
+                    ?>
                 </form>
             </div>
             <div class="content-page">
@@ -54,32 +60,47 @@ $totalPages = ceil($totalData / $limit);
                     echo "<br><br>";
 
                     echo "<table class='tableEvent'>";
-                    echo "<thead>";
-                    echo "<tr>
-                            <th>Game</th>     
-                            <th>Description</th>
-                            <th colspan=2>Action</th>
-                        </tr>";
-                    echo "</thead>";
+                        echo "<thead>";
+                            if ($role == "admin") {
+                                echo "<tr>
+                                        <th>Game</th>     
+                                        <th>Description</th>
+                                        <th colspan=2>Action</th>
+                                    </tr>";
+                            } else {
+                                echo "<tr>
+                                        <th>Game</th>     
+                                        <th>Description</th>
+                                    </tr>";
+                            }
+                        echo "</thead>";
 
-                    echo "<tbody>";
+                        echo "<tbody>";
 
-                    if ($res->num_rows == 0) {
-                        echo "<tr>
-                                <td colspan='3'>No Game Available, Stay Tuned!</td>
-                            </tr>";
-                    } else {
-                        while ($row = $res->fetch_assoc()) {
+                        if ($res->num_rows == 0) {
                             echo "<tr>
-                                    <td>" . $row['name'] . "</td>
-                                    <td>" . $row['description'] . "</td>
-                                    <td><a class='td-event-edit' href='edit_game.php?idgame=". $row['idgame'] ."' style='display:".(($user=="admin")?"block":"none").";'>Edit</a></td>
-                                    <td><a class='td-event-delete' href='delete_game.php?idgame=". $row['idgame'] ."' style='display:".(($user=="admin")?"block":"none").";'>Delete</a></td>
-                                </tr>";  
+                                    <td colspan='3'>No Game Available, Stay Tuned!</td>
+                                </tr>";
+                        } 
+                        else {
+                            while ($row = $res->fetch_assoc()) {
+                                if ($role == "admin") {
+                                    echo "<tr>
+                                            <td>" . $row['name'] . "</td>
+                                            <td>" . $row['description'] . "</td>
+                                            <td><a class='td-btn-edit' href='edit_game.php?idgame=". $row['idgame'] ."' style='display:".(($role=="admin")?"block":"none").";'>Edit</a></td>
+                                            <td><a class='td-btn-delete' href='delete_game.php?idgame=". $row['idgame'] ."' style='display:".(($role=="admin")?"block":"none").";'>Delete</a></td>
+                                        </tr>";  
+                                } else {
+                                    echo "<tr>
+                                            <td>" . $row['name'] . "</td>
+                                            <td>" . $row['description'] . "</td>
+                                        </tr>";  
+                                }
+                            }
                         }
-                    }
 
-                    echo "</tbody>";
+                        echo "</tbody>";
 
                     echo "</table>";
                 ?>

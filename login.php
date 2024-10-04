@@ -1,4 +1,5 @@
 <?php
+session_start();
 $mysqli = new mysqli("localhost", "root", "", "esport");
 
 if ($mysqli->connect_errno) {
@@ -6,7 +7,8 @@ if ($mysqli->connect_errno) {
     exit();
 }
 
-$user = "admin";
+$role = isset($_SESSION['profile']) ? $_SESSION['profile'] : null;
+$user = isset($_SESSION['username']) ? $_SESSION['username'] : null;
 ?>
 
 <!DOCTYPE html>

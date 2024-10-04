@@ -1,4 +1,5 @@
 <?php 
+session_start();
 $mysqli = new mysqli("localhost", "root", "", "esport");
 
 if ($mysqli->connect_errno) {
@@ -6,7 +7,8 @@ if ($mysqli->connect_errno) {
     exit();
 }
 
-$user = "admin";
+$role = isset($_SESSION['profile']) ? $_SESSION['profile'] : null;
+$user = isset($_SESSION['username']) ? $_SESSION['username'] : null;    
 
 $limit = 3; 
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1; 
@@ -33,6 +35,8 @@ $totalPages = ceil($totalData / $limit);
 <body>
     <?php  
         include('header.php');
+
+        if ($role == "admin") {
     ?>
 
     <main class="content">
@@ -50,36 +54,51 @@ $totalPages = ceil($totalData / $limit);
                     echo "<br><br>";
 
                     echo "<table class='tableEvent'>";
-                    echo "<thead>";
-                    echo "<tr>
-                            <th>Event Name</th>
-                            <th>Date</th>
-                            <th>Description</th>
-                            <th colspan=2>Action</th>
-                        </tr>";
-                    echo "</thead>";
+                        echo "<thead>";
+                            if ($role == "admin") {
+                                echo "<tr>
+                                        <th>Event Name</th>
+                                        <th>Date</th>
+                                        <th>Description</th>
+                                        <th colspan=2>Action</th>
+                                    </tr>";
+                            } else {
+                                echo "<tr>
+                                        <th>Event Name</th>
+                                        <th>Date</th>
+                                        <th>Description</th>
+                                    </tr>";
+                            }
+                        echo "</thead>";
 
-                    echo "<tbody>";
+                        echo "<tbody>";
 
-                    if ($res->num_rows == 0) {
-                        echo "<tr>
-                                <td colspan='4'>No Event Available, Stay Tuned!</td>
-                            </tr>";
-                    } else {
-                        while ($row = $res->fetch_assoc()) {
-                            $date = new DateTime($row['date']);
-                            $formatDate = $date->format('d F Y');
-
+                        if ($res->num_rows == 0) {
                             echo "<tr>
-                                    <td>" . $row['name'] . "</td>
-                                    <td>" . $formatDate . "</td>
-                                    <td>" . $row['description'] . "</td>
-                                    <td><a class='td-event-edit' href='join_event.php?idevent=". $row['idevent'] ."' style='display:".(($user=="admin")?"block":"none")."'>Tambah Team</a></td>
-                                </tr>";  
+                                    <td colspan='4'>No Event Available, Stay Tuned!</td>
+                                </tr>";
+                        } else {
+                            while ($row = $res->fetch_assoc()) {
+                                $date = new DateTime($row['date']);
+                                $formatDate = $date->format('d F Y');
+                                if ($role == "admin") {
+                                    echo "<tr>
+                                            <td>" . $row['name'] . "</td>
+                                            <td>" . $formatDate . "</td>
+                                            <td>" . $row['description'] . "</td>
+                                            <td><a class='td-btn-edit' href='join_event.php?idevent=". $row['idevent'] ."' style='display:".(($user=="admin")?"block":"none")."'>Tambah Team</a></td>
+                                        </tr>";
+                                } else {
+                                    echo "<tr>
+                                            <td>" . $row['name'] . "</td>
+                                            <td>" . $formatDate . "</td>
+                                            <td>" . $row['description'] . "</td>
+                                        </tr>";
+                                }
+                            }
                         }
-                    }
 
-                    echo "</tbody>";
+                        echo "</tbody>";
                     echo "</table>";
                 ?>
             </div>
@@ -93,6 +112,18 @@ $totalPages = ceil($totalData / $limit);
         </article>
     </main>
     <?php  
+        }
+
+        else {
+            echo "<main class='content'>
+                    <article>";
+            echo "<div class='content-title'>
+                    <h1 class='h1-content-title'>!! RESTRICTED CONTENT !!</h1>
+                </div>";
+            echo "</article>
+                </main>";
+        }
+
         include('footer.php');
     ?>
 </body>

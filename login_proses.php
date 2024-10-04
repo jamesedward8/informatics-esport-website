@@ -7,8 +7,6 @@
         exit();
     }
 
-    $user = "admin";
-
     if (isset($_POST['btnLogin'])) {
         extract($_POST);
 
@@ -20,8 +18,10 @@
         if($res->num_rows > 0) {
             $row = $res->fetch_assoc();
             if(password_verify($password, $row['password'])) {
+                $_SESSION['idmember'] = $row['idmember'];
                 $_SESSION['username'] = $row['username'];
-                echo "<script>alert('Login successful!'); window.location.href='home.php';</script>";
+                $_SESSION['profile'] = $row['profile'];
+                echo "<script>alert('Welcome, ".$_SESSION['username']."!'); window.location.href='home.php'; </script>";
             } 
             else {
                 echo "<script>alert('Incorrect username or password!'); window.history.back();</script>";
