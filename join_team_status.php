@@ -13,6 +13,14 @@ $idmember = isset($_SESSION['idmember']) ? $_SESSION['idmember'] : null;
 
 $idteam = isset($_GET['idteam']) ? $_GET['idteam'] : null;
 
+$limit = 3; 
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1; 
+$offset = ($page - 1) * $limit; 
+
+$resultTotal = $mysqli->query("SELECT COUNT(*) AS total FROM join_proposal");
+$rowTotal = $resultTotal->fetch_assoc();
+$totalData = $rowTotal['total'];
+$totalPages = ceil($totalData / $limit);
 ?>
 
 <!DOCTYPE html>
@@ -86,6 +94,13 @@ $idteam = isset($_GET['idteam']) ? $_GET['idteam'] : null;
                         echo "</tbody>";
                     echo "</table>";
                 ?>
+            </div>
+            <div class="pagination">
+            <?php
+                for ($i = 1; $i <= $totalPages; $i++) {
+                    echo "<a href='?page=$i' class='page-btn " . (($i == $page) ? 'active' : '') . "'>$i</a>";
+                }
+            ?>
             </div>
         </article>
     </main>
