@@ -53,7 +53,8 @@ $totalPages = ceil($totalData / $limit);
             </div>
             <div class="content-page">
                 <?php
-                    $stmt = $mysqli->prepare("SELECT t.name as namateam, g.name as namagame, t.idteam 
+                    // Query teams with games
+                    $stmt = $mysqli->prepare("SELECT t.name as namateam, g.name as namagame, t.idteam, g.idgame 
                                                FROM team t 
                                                JOIN game g ON t.idgame = g.idgame 
                                                LIMIT ? OFFSET ?");
@@ -93,6 +94,20 @@ $totalPages = ceil($totalData / $limit);
                                     <td colspan='5'>No Team Available, Stay Tuned!</td>
                                 </tr>";
                         } else {
+                            // Check if the member is already part of a team for a specific game
+                            $stmt_check_game = $mysqli->prepare("SELECT jp.idteam, t.idgame 
+                                                                 FROM join_proposal jp 
+                                                                 JOIN team t ON jp.idteam = t.idteam 
+                                                                 WHERE jp.idmember = ? AND jp.status = 'approved'");
+                            $stmt_check_game->bind_param('i', $iduser);
+                            $stmt_check_game->execute();
+                            $res_game_check = $stmt_check_game->get_result();
+
+                            $accepted_games = [];
+                            while ($game_row = $res_game_check->fetch_assoc()) {
+                                $accepted_games[$game_row['idgame']] = $game_row['idteam'];
+                            }
+
                             while ($row = $res->fetch_assoc()) {
                                 if ($role == "admin") {
                                     echo "<tr>
@@ -108,18 +123,55 @@ $totalPages = ceil($totalData / $limit);
                                             <td>" . $row['namateam'] . "</td>
                                             <td>" . $row['namagame'] . "</td>";
 
-                                            $stmt = $mysqli->prepare("SELECT jp.idteam, jp.idmember FROM join_proposal jp WHERE jp.idteam = ? AND jp.status = 'waiting' AND jp.idmember = ?");
-                                            $stmt->bind_param('ii', $row['idteam'], $iduser);
-                                            $stmt->execute();
-                                            $res_jp_check = $stmt->get_result();
+                                            // Query 1: Check if a proposal is in waiting state for this team
+                                            $stmt1 = $mysqli->prepare("SELECT jp.idteam, jp.idmember 
+                                                                       FROM join_proposal jp 
+                                                                       WHERE jp.idteam = ? AND jp.status = 'waiting' AND jp.idmember = ?");
+                                            $stmt1->bind_param('ii', $row['idteam'], $iduser);
+                                            $stmt1->execute();
+                                            $res_jp_check = $stmt1->get_result();
 
-                                            // Check if any row was returned
                                             if ($res_jp_check->num_rows > 0) { 
-                                                // The member has already submitted a proposal, show 'See Status'
-                                                echo "<td><a class='td-btn-edit' href='join_team_status.php?idteam=". $row['idteam'] ."&idmember=". $iduser ."'style='display:".(($role=="member")?"block":"none").";'>See Status</a></td>";
+                                                // Proposal is in waiting state
+                                                echo "<td><a class='td-btn-edit' href='join_team_status.php?idteam=". $row['idteam'] ."&idmember=". $iduser ."' style='display:".(($role=="member")?"block":"none").";'>See Status</a></td>";
                                             } else { 
-                                                // No proposal exists, show 'Join' option
-                                                echo "<td><a class='td-btn-edit' href='join_team.php?idteam=". $row['idteam'] ."&idmember=". $iduser ."'style='display:".(($role=="member")?"block":"none").";' name='btn-Join'>Join</a></td>";
+                                                // Query 2: Check if the proposal is accepted or rejected
+                                                $stmt2 = $mysqli->prepare("SELECT jp.status 
+                                                                           FROM join_proposal jp 
+                                                                           WHERE jp.idteam = ? AND jp.idmember = ?");
+                                                $stmt2->bind_param('ii', $row['idteam'], $iduser);
+                                                $stmt2->execute();
+                                                $res_status_check = $stmt2->get_result();
+
+                                                if ($res_status_check->num_rows > 0) {
+                                                    $proposal = $res_status_check->fetch_assoc();
+                                                    
+                                                    if ($proposal['status'] == 'approved') {
+                                                        // Proposal is approved
+                                                        echo "<td><span style='color: green; font-weight: bold;'>Approved</span></td>";
+                                                    } else if ($proposal['status'] == 'rejected') {
+                                                        // Proposal is rejected
+                                                        echo "<td><span style='color: red; font-weight: bold;'>Rejected</span></td>";
+                                                    } else {
+                                                        // If no specific proposal is found, check if the member is already in another team playing the same game
+                                                        if (isset($accepted_games[$row['idgame']])) {
+                                                            // Member is already accepted in another team for the same game
+                                                            echo "<td><span style='color: red; font-weight: bold;'>Not Eligible to Join</span></td>";
+                                                        } else {
+                                                            // Member is eligible to join this team
+                                                            echo "<td><a class='td-btn-edit' href='join_team.php?idteam=". $row['idteam'] ."&idmember=". $iduser ."' style='display:".(($role=="member")?"block":"none").";' name='btn-Join'>Join</a></td>";
+                                                        }
+                                                    }
+                                                } else {
+                                                    // No proposal exists, but check if the member is already in another team for this game
+                                                    if (isset($accepted_games[$row['idgame']])) {
+                                                        // Member is already accepted in another team for the same game
+                                                        echo "<td><span style='color: darkred; font-weight: bold;'>Not Eligible to Join</span></td>";
+                                                    } else {
+                                                        // Member is eligible to join this team
+                                                        echo "<td><a class='td-btn-edit' href='join_team.php?idteam=". $row['idteam'] ."&idmember=". $iduser ."' style='display:".(($role=="member")?"block":"none").";' name='btn-Join'>Join</a></td>";
+                                                    }
+                                                }
                                             }
 
                                     echo "</tr>";  

@@ -19,7 +19,11 @@ $role = isset($_SESSION['profile']) ? $_SESSION['profile'] : null;
             <a href="event.php" <?php echo "style = 'display:yes';" ?>><nav class="navbar">EVENT</nav></a>
             <a href="game.php" <?php echo "style = 'display:yes';" ?>><nav class="navbar">DIVISION</nav></a>
             <a href="team.php" <?php echo "style = 'display:yes';" ?>><nav class="navbar">TEAM</nav></a>
-            <a href="recruitment.php" <?php echo "style = 'display:".(isset($_SESSION['username']) ? 'yes' : 'none')."';" ?>><nav class="navbar">RECRUITMENT</nav></a>
+            <?php 
+                if ($role == "admin") {
+                    echo "<a href='join_team_decide.php' 'style = 'display:".(isset($_SESSION['username']) ? 'yes' : 'none')."';'><nav class='navbar'>RECRUITMENT</nav></a>";
+                }
+            ?>
             <a href="manage.php" <?php echo "style = 'display:".($role == 'admin' ? 'yes' : 'none')."';" ?>><nav class="navbar">MANAGE</nav></a> 
         </div>
         <div class="nav-kanan">

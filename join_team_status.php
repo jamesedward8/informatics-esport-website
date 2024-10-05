@@ -9,10 +9,10 @@ if ($mysqli->connect_errno) {
 }
 
 $role = isset($_SESSION['profile']) ? $_SESSION['profile'] : null;
-$user = isset($_SESSION['username']) ? $_SESSION['username'] : null;
 $idmember = isset($_SESSION['idmember']) ? $_SESSION['idmember'] : null;
 
 $idteam = isset($_GET['idteam']) ? $_GET['idteam'] : null;
+
 ?>
 
 <!DOCTYPE html>
@@ -37,39 +37,55 @@ $idteam = isset($_GET['idteam']) ? $_GET['idteam'] : null;
             </div>
             <br><br><br>
             <div class="content-page">
-                <table class="tableEvent">
-                    <thead>
-                        <tr>
-                            <th scope="col">Team Name</th>
-                            <th scope="col">Role</th>
-                            <th scope="col">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php 
-                            $result = $mysqli->query("SELECT t.idteam, t.name, jp.description, jp.status FROM join_proposal jp INNER JOIN team t ON jp.idteam = t.idteam WHERE jp.idmember = '$idmember'");
-                            while ($row = $result->fetch_assoc()) {
-                                $idteam = $row['idteam'];
-                                $team = $mysqli->query("SELECT * FROM team WHERE idteam = '$idteam'")->fetch_assoc();
-                                echo "<tr>";
-                                echo "<td>" . $team['name'] . "</td>";
-                                echo "<td>" . $row['description'] . "</td>";
-                                if ($row['status'] == "waiting") {
-                                    echo "<td style='color: lightblue; font-weight: bold;'>". $row['status'] ."</td>";
+                <?php 
+                    echo "<table class='tableEvent'>";
+                        echo "<thead>";
+                            echo "<tr>";
+                                if ($role == "member") {
+                                    echo "<th>Team Name</th>";
+                                    echo "<th>Game</th>";
+                                    echo "<th>Role</th>";
+                                    echo "<th>Status</th>";
                                 }
+                            echo "</tr>";
+                        echo "</thead>";
+                        echo "<tbody>";
 
-                                else if ($row['status'] == "accepted") {
-                                    echo "<td style='color: green; font-weight: bold;'>". $row['status'] ."</td>";
-                                }
+                        if ($role == "member") { 
+                            // Query for members to fetch only their own proposal
+                            $stmt = $mysqli->prepare("SELECT t.idteam, g.name, t.name, m.username, jp.description, jp.status FROM join_proposal jp INNER JOIN team t ON jp.idteam = t.idteam INNER JOIN game g ON t.idgame=g.idgame INNER JOIN member m ON jp.idmember = m.idmember WHERE jp.idmember = ?");
+                            $stmt->bind_param('i', $idmember);
+                        }
+                        
+                        $stmt->execute();
+                        $result = $stmt->get_result();
 
-                                else if ($row['status'] == "rejected") {
-                                    echo "<td style='color: red; font-weight: bold;'>". $row['status'] ."</td>";
+                        // Loop through the results and display them
+                        while ($row = $result->fetch_assoc()) {
+                            $idteam = $row['idteam'];
+                            $team = $mysqli->query("SELECT * FROM team WHERE idteam = '$idteam'")->fetch_assoc();
+                            $game = $mysqli->query("SELECT * FROM game WHERE idgame = '$team[idgame]'")->fetch_assoc();
+                            echo "<tr>";
+                                if ($role == "member") {
+                                    // Display only team name, game, role, and status for the member
+                                    echo "<td>" . $team['name'] . "</td>";
+                                    echo "<td>" . $game['name'] . "</td>";
+                                    echo "<td>" . $row['description'] . "</td>";
+                                    
+                                    // Status with color coding
+                                    if ($row['status'] == "waiting") {
+                                        echo "<td style='color: lightblue; font-weight: bold;'>". $row['status'] ."</td>";
+                                    } else if ($row['status'] == "accepted") {
+                                        echo "<td style='color: green; font-weight: bold;'>". $row['status'] ."</td>";
+                                    } else if ($row['status'] == "rejected") {
+                                        echo "<td style='color: red; font-weight: bold;'>". $row['status'] ."</td>";
+                                    }
                                 }
-                                echo "</tr>";
-                            }
-                        ?>
-                    </tbody>
-                </table>
+                            echo "</tr>";
+                        }
+                        echo "</tbody>";
+                    echo "</table>";
+                ?>
             </div>
         </article>
     </main>
