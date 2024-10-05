@@ -11,6 +11,14 @@ if ($mysqli->connect_errno) {
 $role = isset($_SESSION['profile']) ? $_SESSION['profile'] : null;
 $idmember = isset($_SESSION['idmember']) ? $_SESSION['idmember'] : null;
 
+$limit = 3; 
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1; 
+$offset = ($page - 1) * $limit; 
+
+$resultTotal = $mysqli->query("SELECT COUNT(*) AS total FROM join_proposal");
+$rowTotal = $resultTotal->fetch_assoc();
+$totalData = $rowTotal['total'];
+$totalPages = ceil($totalData / $limit);
 ?>
 
 <!DOCTYPE html>
@@ -44,7 +52,7 @@ $idmember = isset($_SESSION['idmember']) ? $_SESSION['idmember'] : null;
                                     echo "<th>Team Name</th>";
                                     echo "<th>Game</th>";
                                     echo "<th>Role</th>";
-                                    echo "<th colspan='2'>Action</th>";
+                                    echo "<th>Action</th>"; // Only one column for action now
                                 } 
                             echo "</tr>";
                         echo "</thead>";
@@ -56,34 +64,53 @@ $idmember = isset($_SESSION['idmember']) ? $_SESSION['idmember'] : null;
                             FROM join_proposal jp 
                             INNER JOIN team t ON jp.idteam = t.idteam 
                             INNER JOIN game g ON t.idgame = g.idgame 
-                            INNER JOIN member m ON jp.idmember = m.idmember");
+                            INNER JOIN member m ON jp.idmember = m.idmember
+                            LIMIT ? OFFSET ?");
+                            $stmt->bind_param('ii', $limit, $offset);
+                            $stmt->execute();
+                            $result = $stmt->get_result();
                         } 
-                                
-                        $stmt->execute();
-                        $result = $stmt->get_result();
 
                         if ($result->num_rows == 0) {
-                            echo "<tr><td colspan='6'>No join proposal found.</td></tr>";
-                        }
-
-                        else {
+                            echo "<tr><td colspan='5'>No join proposal found.</td></tr>";
+                        } else {
                             // Loop through the results and display them
                             while ($row = $result->fetch_assoc()) {
-                                  echo "<tr>";
-                                    if ($role == "admin") {
-                                        // Display the member's username, team name, game, and action options
-                                        echo "<td>" . $row['username'] . "</td>";
-                                        echo "<td>" . $row['team_name'] . "</td>";
-                                        echo "<td>" . $row['game_name'] . "</td>";
-                                        echo "<td>" . $row['description'] . "</td>";
-                                        echo "<td><a class='td-btn-edit' href='join_team_result.php?idteam=". $row['idteam'] ."&idmember=". $row['idmember'] ."&result=approved' name='btn-acc'>Approve</a></td>";
-                                        echo "<td><a style='color: red;' class= 'td-btn-edit' href='join_team_result.php?idteam=". $row['idteam'] ."&idmember=". $row['idmember'] ."&result=rejected' name='btn-rej'>Reject</a></td>";
-                                    }           
+                                echo "<tr>";
+                                if ($role == "admin") {
+                                    echo "<td>" . $row['username'] . "</td>";
+                                    echo "<td>" . $row['team_name'] . "</td>";
+                                    echo "<td>" . $row['game_name'] . "</td>";
+                                    echo "<td>" . $row['description'] . "</td>";
+                                    
+                                    // Display the action based on the status
+                                    if ($row['status'] == 'waiting') {
+                                        // Show Approve and Reject buttons if the proposal is still in waiting state
+                                        echo "<td>
+                                                <a class='td-btn-edit' href='join_team_result.php?idteam=". $row['idteam'] ."&idmember=". $row['idmember'] ."&result=approved' name='btn-acc'>Approve</a> 
+                                                <a style='color: red;' class='td-btn-edit' href='join_team_result.php?idteam=". $row['idteam'] ."&idmember=". $row['idmember'] ."&result=rejected' name='btn-rej'>Reject</a>
+                                              </td>";
+                                    } else {
+                                        // Show the status (Approved or Rejected) and remove the buttons
+                                        if ($row['status'] == 'approved') {
+                                            echo "<td><span style='color: green; font-weight: bold;'>Approved</span></td>";
+                                        } elseif ($row['status'] == 'rejected') {
+                                            echo "<td><span style='color: darkred; font-weight: bold;'>Rejected</span></td>";
+                                        }
+                                    }
+                                }
                                 echo "</tr>";
                             }
                         }
                         echo "</tbody>";
                     echo "</table>";
+                ?>
+            </div>
+            <div class="pagination">
+                <?php
+                    for ($i = 1; $i <= $totalPages; $i++) {
+                        echo "<a href='?page=$i' class='page-btn " . (($i == $page) ? 'active' : '') . "'>$i</a>";
+                    }
                 ?>
             </div>
         </article>
