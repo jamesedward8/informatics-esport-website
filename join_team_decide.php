@@ -52,7 +52,7 @@ $totalPages = ceil($totalData / $limit);
                                     echo "<th>Team Name</th>";
                                     echo "<th>Game</th>";
                                     echo "<th>Role</th>";
-                                    echo "<th>Action</th>"; // Only one column for action now
+                                    echo "<th colspan='2'>Action</th>"; // Only one column for action now
                                 } 
                             echo "</tr>";
                         echo "</thead>";
@@ -86,16 +86,16 @@ $totalPages = ceil($totalData / $limit);
                                     // Display the action based on the status
                                     if ($row['status'] == 'waiting') {
                                         // Show Approve and Reject buttons if the proposal is still in waiting state
-                                        echo "<td>
-                                                <a class='td-btn-edit' href='join_team_result.php?idteam=". $row['idteam'] ."&idmember=". $row['idmember'] ."&result=approved' name='btn-acc'>Approve</a> 
-                                                <a style='color: red;' class='td-btn-edit' href='join_team_result.php?idteam=". $row['idteam'] ."&idmember=". $row['idmember'] ."&result=rejected' name='btn-rej'>Reject</a>
+                                        echo "<td colspan='1'>
+                                                <a class='td-btn-edit' href='join_team_result.php?idteam=". $row['idteam'] ."&idmember=". $row['idmember'] ."&result=approved' name='btn-acc'>Approve<a></td>
+                                            <td colspan='1'><a style='color: red;' class='td-btn-edit' href='join_team_result.php?idteam=". $row['idteam'] ."&idmember=". $row['idmember'] ."&result=rejected' name='btn-rej'>Reject</a>
                                               </td>";
                                     } else {
                                         // Show the status (Approved or Rejected) and remove the buttons
                                         if ($row['status'] == 'approved') {
-                                            echo "<td><span style='color: green; font-weight: bold;'>Approved</span></td>";
+                                            echo "<td colspan='2'><span style='color: green; font-weight: bold;'>Approved</span></td>";
                                         } elseif ($row['status'] == 'rejected') {
-                                            echo "<td><span style='color: darkred; font-weight: bold;'>Rejected</span></td>";
+                                            echo "<td colspan='2'><span style='color: darkred; font-weight: bold;'>Rejected</span></td>";
                                         }
                                     }
                                 }

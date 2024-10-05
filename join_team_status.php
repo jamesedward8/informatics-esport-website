@@ -83,7 +83,7 @@ $totalPages = ceil($totalData / $limit);
                                     // Status with color coding
                                     if ($row['status'] == "waiting") {
                                         echo "<td style='color: lightblue; font-weight: bold;'>". $row['status'] ."</td>";
-                                    } else if ($row['status'] == "accepted") {
+                                    } else if ($row['status'] == "approved") {
                                         echo "<td style='color: green; font-weight: bold;'>". $row['status'] ."</td>";
                                     } else if ($row['status'] == "rejected") {
                                         echo "<td style='color: red; font-weight: bold;'>". $row['status'] ."</td>";
