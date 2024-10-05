@@ -73,5 +73,8 @@ $idteam = isset($_GET['idteam']) ? $_GET['idteam'] : null;
             </div>
         </article>
     </main>
+    <?php 
+        include('footer.php');
+    ?>
 </body>
 </html>

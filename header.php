@@ -5,6 +5,9 @@ if ($mysqli->connect_errno) {
     echo "Failed to connect to MySQL: " . $mysqli->connect_error;
     exit();
 }
+
+$role = isset($_SESSION['profile']) ? $_SESSION['profile'] : null;
+
 ?>
 <header class="header">
     <div class="containerLogo">
@@ -16,8 +19,8 @@ if ($mysqli->connect_errno) {
             <a href="event.php" <?php echo "style = 'display:yes';" ?>><nav class="navbar">EVENT</nav></a>
             <a href="game.php" <?php echo "style = 'display:yes';" ?>><nav class="navbar">DIVISION</nav></a>
             <a href="team.php" <?php echo "style = 'display:yes';" ?>><nav class="navbar">TEAM</nav></a>
-            <a href="recruitment.php" <?php echo "style = 'display:yes';" ?>><nav class="navbar">RECRUITMENT</nav></a>
-            <a href="manage.php" <?php echo "style = 'display:".(isset($_SESSION['role']) && $_SESSION['role'] == 'admin' ? 'yes' : 'none')."';" ?>><nav class="navbar">MANAGE</nav></a> 
+            <a href="recruitment.php" <?php echo "style = 'display:".(isset($_SESSION['username']) ? 'yes' : 'none')."';" ?>><nav class="navbar">RECRUITMENT</nav></a>
+            <a href="manage.php" <?php echo "style = 'display:".($role == 'admin' ? 'yes' : 'none')."';" ?>><nav class="navbar">MANAGE</nav></a> 
         </div>
         <div class="nav-kanan">
             <?php if (isset($_SESSION['username'])): ?>

@@ -49,14 +49,7 @@ $totalPages = ceil($totalData / $limit);
                             echo "<input type='submit' class='btn-add-ev' value='ADD' name='btnAdd'>";
                         }
                     ?>
-                </form>
-                <form action="join_team_status.php">
-                    <?php 
-                        if ($role == "member") {
-                            echo "<input type='submit' class='btn-add-event' name='btn-check' value='Proposal Status'>";
-                        }
-                    ?>
-                </form>
+                </form>            
             </div>
             <div class="content-page">
                 <?php
@@ -78,11 +71,17 @@ $totalPages = ceil($totalData / $limit);
                                         <th>Game Name</th>
                                         <th colspan=2>Action</th>
                                     </tr>";
-                            } else {
+                            } else if ($role == "member") {
                                 echo "<tr>
                                         <th>Team Name</th>
                                         <th>Game Name</th>
                                         <th>Action</th>
+                                    </tr>";
+                            }
+                            else if ($role == null) {
+                                echo "<tr>
+                                        <th>Team Name</th>
+                                        <th>Game Name</th>
                                     </tr>";
                             }
                         echo "</thead>";
@@ -104,12 +103,33 @@ $totalPages = ceil($totalData / $limit);
                                         </tr>";  
                                 } 
                                 
-                                else {
+                                else if ($role == "member") {
+                                    echo "<tr>
+                                            <td>" . $row['namateam'] . "</td>
+                                            <td>" . $row['namagame'] . "</td>";
+
+                                            $stmt = $mysqli->prepare("SELECT jp.idteam, jp.idmember FROM join_proposal jp WHERE jp.idteam = ? AND jp.status = 'waiting' AND jp.idmember = ?");
+                                            $stmt->bind_param('ii', $row['idteam'], $iduser);
+                                            $stmt->execute();
+                                            $res_jp_check = $stmt->get_result();
+
+                                            // Check if any row was returned
+                                            if ($res_jp_check->num_rows > 0) { 
+                                                // The member has already submitted a proposal, show 'See Status'
+                                                echo "<td><a class='td-btn-edit' href='join_team_status.php?idteam=". $row['idteam'] ."&idmember=". $iduser ."'style='display:".(($role=="member")?"block":"none").";'>See Status</a></td>";
+                                            } else { 
+                                                // No proposal exists, show 'Join' option
+                                                echo "<td><a class='td-btn-edit' href='join_team.php?idteam=". $row['idteam'] ."&idmember=". $iduser ."'style='display:".(($role=="member")?"block":"none").";' name='btn-Join'>Join</a></td>";
+                                            }
+
+                                    echo "</tr>";  
+                                }
+
+                                else if ($role == null) {
                                     echo "<tr>
                                             <td>" . $row['namateam'] . "</td>
                                             <td>" . $row['namagame'] . "</td>
-                                            <td><a class='td-btn-edit' href='join_team.php?idteam=". $row['idteam'] ."&idmember=". $iduser ."' style='display:".(($role=="member")?"block":"none").";' name='btn-Join'>Join</a></td>
-                                        </tr>";  
+                                        </tr>";
                                 }
                             }
                         }

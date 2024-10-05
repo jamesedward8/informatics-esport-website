@@ -1,5 +1,6 @@
 <?php 
 session_start();
+
 $mysqli = new mysqli("localhost", "root", "", "esport");
 
 if ($mysqli->connect_errno) {
@@ -62,13 +63,7 @@ $totalPages = ceil($totalData / $limit);
                                         <th>Description</th>
                                         <th colspan=2>Action</th>
                                     </tr>";
-                            } else {
-                                echo "<tr>
-                                        <th>Event Name</th>
-                                        <th>Date</th>
-                                        <th>Description</th>
-                                    </tr>";
-                            }
+                            } 
                         echo "</thead>";
 
                         echo "<tbody>";
@@ -86,15 +81,9 @@ $totalPages = ceil($totalData / $limit);
                                             <td>" . $row['name'] . "</td>
                                             <td>" . $formatDate . "</td>
                                             <td>" . $row['description'] . "</td>
-                                            <td><a class='td-btn-edit' href='join_event.php?idevent=". $row['idevent'] ."' style='display:".(($user=="admin")?"block":"none")."'>Tambah Team</a></td>
+                                            <td><a class='td-btn-edit' href='join_event.php?idevent=". $row['idevent'] ."' style='display:".(($role=="admin")?"block":"none")."'>Tambah Team</a></td>
                                         </tr>";
-                                } else {
-                                    echo "<tr>
-                                            <td>" . $row['name'] . "</td>
-                                            <td>" . $formatDate . "</td>
-                                            <td>" . $row['description'] . "</td>
-                                        </tr>";
-                                }
+                                } 
                             }
                         }
 
