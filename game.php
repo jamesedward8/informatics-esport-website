@@ -107,8 +107,14 @@ $totalPages = ceil($totalData / $limit);
             </div>
             <div class="pagination">
                 <?php
+                if ($page > 1) {
+                    echo "<a href='?page=1' class='page-btn'>First</a>";
+                }
                 for ($i = 1; $i <= $totalPages; $i++) {
                     echo "<a href='?page=$i' class='page-btn " . (($i == $page) ? 'active' : '') . "'>$i</a>";
+                }
+                if ($page < $totalPages) {
+                    echo "<a href='?page=$totalPages' class='page-btn'>Last</a>";
                 }
                 ?>
             </div>
