@@ -12,6 +12,8 @@ $role = isset($_SESSION['profile']) ? $_SESSION['profile'] : null;
 
 $idteam = isset($_GET['idteam']) ? $_GET['idteam'] : null;
 $idmember = isset($_GET['idmember']) ? $_GET['idmember'] : null;
+$chosen_role = isset($_GET['role-chosen']) ? $_GET['role-chosen'] : null;
+
 $result = isset($_GET['result']) ? $_GET['result'] : null;
 
 if ($idteam && $idmember && ($result == "approved" || $result == "rejected")) {
@@ -20,9 +22,18 @@ if ($idteam && $idmember && ($result == "approved" || $result == "rejected")) {
 
     $stmt->bind_param("sii", $result, $idteam, $idmember);
 
-    if ($stmt->execute()) {
+    if ($stmt->execute()) 
+    {
+        $stmt2 = $mysqli->prepare("INSERT INTO team_members (idteam, idmember, description) VALUES (?, ?, ?)");
+
+        $stmt2->bind_param("iis", $idteam, $idmember, $chosen_role);
+
+        $stmt2->execute();
+
         echo "<script>alert('Join proposal has been $result!'); window.location.href='join_team_decide.php';</script>";
-    } else {
+    } 
+    
+    else {
         echo "<script>alert('Error: " . $mysqli->error . "'); window.history.back();</script>";
     }
 

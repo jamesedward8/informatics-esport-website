@@ -52,6 +52,22 @@ $totalPages = ceil($totalData / $limit);
                     if ($role == "admin") {
                         echo "<input type='submit' class='btn-add-ev' value='ADD' name='btnAdd'>";
                     }
+
+                    else {
+                        $stmt_view_team = $mysqli->prepare("SELECT tm.idteam, tm.idmember, tm.description, t.name as namateam, g.name as namagame 
+                                                            FROM team_members tm 
+                                                            JOIN team t ON tm.idteam = t.idteam 
+                                                            JOIN game g ON t.idgame = g.idgame 
+                                                            WHERE tm.idmember = ?");
+
+                        $stmt_view_team->bind_param('i', $iduser);
+                        $stmt_view_team->execute();
+                        $res_view_team = $stmt_view_team->get_result();
+
+                        if ($row_view_team = $res_view_team->fetch_assoc()) {
+                            echo "<a class='btn-view-my-team' href='view_my_team.php?idteam=" . $row_view_team['idteam'] . "'>View My Team</a>";
+                        } 
+                    }
                     ?>
                 </form>
             </div>

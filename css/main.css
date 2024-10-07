@@ -190,7 +190,8 @@ td {
 .btn-add-ev,
 .btn-edit-event,
 .btn-add-event,
-.btn-add-team {
+.btn-add-team,
+.btn-view-my-team {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -202,6 +203,11 @@ td {
     font-family: "Inria Sans", sans-serif;
     font-weight: 700;
     font-style: bold;
+}
+
+.btn-view-my-team {
+    width: 200px;
+    height: 40px;
 }
 
 .btn-add-ev {

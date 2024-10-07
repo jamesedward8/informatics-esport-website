@@ -87,8 +87,8 @@ $totalPages = ceil($totalData / $limit);
                                     if ($row['status'] == 'waiting') {
                                         // Show Approve and Reject buttons if the proposal is still in waiting state
                                         echo "<td colspan='1'>
-                                                <a class='td-btn-edit' href='join_team_result.php?idteam=". $row['idteam'] ."&idmember=". $row['idmember'] ."&result=approved' name='btn-acc'>Approve<a></td>
-                                            <td colspan='1'><a style='color: red;' class='td-btn-edit' href='join_team_result.php?idteam=". $row['idteam'] ."&idmember=". $row['idmember'] ."&result=rejected' name='btn-rej'>Reject</a>
+                                                <a class='td-btn-edit' href='join_team_result.php?idteam=". $row['idteam'] ."&idmember=". $row['idmember'] ."&role-chosen=". $row['description'] ."&result=approved' name='btn-acc'>Approve<a></td>
+                                            <td colspan='1'><a style='color: red;' class='td-btn-edit' href='join_team_result.php?idteam=". $row['idteam'] ."&idmember=". $row['idmember'] ."&role-chosen=". $row['description'] ."&result=rejected' name='btn-rej'>Reject</a>
                                               </td>";
                                     } else {
                                         // Show the status (Approved or Rejected) and remove the buttons
