@@ -6,8 +6,6 @@
         exit();
     }
 
-    $user = "admin";
-
     if (isset($_POST['btnCreateAccount'])) {
         if ($_POST['password'] == $_POST['repassword']){
             extract($_POST);
@@ -15,9 +13,7 @@
             $profile = "member";
             $stmt = $mysqli->prepare("INSERT INTO member (fname, lname, username, password, profile) VALUES (?, ?, ?, ?, ?)");
             $hash_password = password_hash($password, PASSWORD_DEFAULT);
-            if ($username == "admin") {
-                $profile = "admin";
-            }
+                
             $stmt->bind_param("sssss", $fname, $lname, $username, $hash_password, $profile);
 
             if ($stmt->execute()) {
