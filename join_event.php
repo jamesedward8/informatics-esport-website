@@ -60,10 +60,10 @@ $result_team = $mysqli->query("SELECT * FROM team");
                 
                 <br><br>
                 
-                <div class="content-submenu-page">
+                <div class="content-submenu-page"> 
                     <h2>Teams that have joined this event:</h2>
                     <?php
-                        $stmt = $mysqli->prepare("SELECT t.name FROM event_teams et JOIN team t ON et.idteam = t.idteam WHERE et.idevent = ?");
+                        $stmt = $mysqli->prepare("SELECT t.name, t.idteam, et.idevent FROM event_teams et JOIN team t ON et.idteam = t.idteam WHERE et.idevent = ?");
                         $stmt->bind_param("i", $idevent);
                         $stmt->execute();
                         $result = $stmt->get_result();
@@ -73,12 +73,14 @@ $result_team = $mysqli->query("SELECT * FROM team");
                             echo "<thead>";
                             echo "<tr>
                                     <th>Team Name</th>
-                                  </tr>";
+                                    <th>Action</th>
+                                </tr>";
                             echo "</thead>";
 
                             echo "<tbody>";
                             while ($row = $result->fetch_assoc()) {
-                                echo "<tr><td>" . $row['name'] . "</td></tr>";
+                                echo "<tr><td>" . $row['name'] . "</td>
+                                <td><a class='td-btn-delete' href='delete_event_team.php?idevent=" . $row['idevent']. "&idteam=". $row['idteam'] . "' style='display:" . (($role == "admin") ? "block" : "none") . ";'>Delete</a></td></tr>";
                             }
                             echo "</tbody>";
                             echo "</table>";
