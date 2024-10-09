@@ -7,7 +7,6 @@ if ($mysqli->connect_errno) {
     exit();
 }
 
-// Periksa apakah 'idevent' ada di URL
 if (isset($_GET['idevent'])) {
     $idevent = $_GET['idevent'];
 } else {
@@ -15,7 +14,6 @@ if (isset($_GET['idevent'])) {
     exit();
 }
 
-// Ambil daftar tim dari tabel team
 $result_team = $mysqli->query("SELECT * FROM team");
 ?>
 
@@ -39,17 +37,14 @@ $result_team = $mysqli->query("SELECT * FROM team");
                 <h1 class="h1-content-title">Adding Team to Event</h1>
             </div>
             <div class="content-page">
-                <!-- Form untuk menambahkan tim ke event -->
                 <form action="join_event_proses.php" method="POST">
-                    <!-- Menyembunyikan idevent di input hidden -->
-                    <input type="hidden" name="idevent" value="<?php echo $idevent; ?>">
+=                    <input type="hidden" name="idevent" value="<?php echo $idevent; ?>">
                     
                     <div class="form-section">
                         <label for="idteam" class="form-label label-add-event">Pilih Tim:</label>
                         <select name="idteam" class="form-control input-add-event" id="idteam" required>
                             <option value="">-- Pilih Tim --</option>
                             <?php 
-                            // Menampilkan opsi tim dari tabel team
                             while ($row = $result_team->fetch_assoc()): ?>
                                 <option value="<?php echo $row['idteam']; ?>">
                                     <?php echo $row['name']; ?>
@@ -65,11 +60,9 @@ $result_team = $mysqli->query("SELECT * FROM team");
                 
                 <br><br>
                 
-                <!-- Tabel menampilkan tim yang sudah bergabung dengan event -->
                 <div class="content-submenu-page">
                     <h2>Teams that have joined this event:</h2>
                     <?php
-                        // Query untuk mengambil tim yang sudah bergabung dalam event ini
                         $stmt = $mysqli->prepare("SELECT t.name FROM event_teams et JOIN team t ON et.idteam = t.idteam WHERE et.idevent = ?");
                         $stmt->bind_param("i", $idevent);
                         $stmt->execute();

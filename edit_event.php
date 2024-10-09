@@ -1,4 +1,5 @@
 <?php 
+    session_start();
     $mysqli = new mysqli ("localhost", "root", "", "esport");
 
     if ($mysqli->connect_errno) {
