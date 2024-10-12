@@ -6,8 +6,6 @@
         exit();
     }
 
-    $user = "admin";
-
     if (isset($_POST['btnEditEv'])) {
         extract($_POST);
 
@@ -20,9 +18,8 @@
 
         echo "<script>
                 alert('Data updated successfully!');
-                window.location.href='team.php?idteam=$idteam&result=updated';
+                window.location.href='game.php?idgame=$idgame&result=updated';
             </script>";
     }
-
     $mysqli->close();
 ?>

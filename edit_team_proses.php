@@ -6,8 +6,6 @@
         exit();
     }
 
-    $user = "admin";
-
     if (isset($_POST['btnEditEv'])) {
         extract($_POST);
 
@@ -23,6 +21,5 @@
                 window.location.href='team.php?idteam=$idteam   &result=updated';
             </script>";
     }
-
     $mysqli->close();
 ?>

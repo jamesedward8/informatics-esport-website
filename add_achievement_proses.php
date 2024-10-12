@@ -21,7 +21,7 @@
         echo "<script>
                 alert('Data added successfully!');
                 window.location.href='home.php?result=added';
-            </script>";
+             </script>";
     }
 
     $mysqli->close();

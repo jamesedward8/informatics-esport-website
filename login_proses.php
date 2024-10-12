@@ -21,7 +21,7 @@
                 $_SESSION['idmember'] = $row['idmember'];
                 $_SESSION['username'] = $row['username'];
                 $_SESSION['profile'] = $row['profile'];
-                echo "<script>alert('Welcome, ".$_SESSION['username']."!'); window.location.href='home.php'; </script>";
+                echo "<script>window.location.href='home.php?login=success';</script>";
             } 
             else {
                 echo "<script>alert('Incorrect username or password!'); window.history.back();</script>";
@@ -31,5 +31,5 @@
             echo "<script>alert('User not found!'); window.history.back();</script>";
         }
     }
-
     $mysqli->close();
+?>

@@ -6,8 +6,6 @@
         exit();
     }
 
-    $user = "admin";
-
     if (isset($_POST['btnAddEv'])) {
         extract($_POST);
 

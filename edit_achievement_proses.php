@@ -5,8 +5,6 @@
         echo "Failed to connect to MySQL: " . $mysqli->connect_error;
         exit();
     }
-    
-    $user = "admin";
 
     if (isset($_POST['btnEditEv'])) {
         extract($_POST);
@@ -23,6 +21,5 @@
                 window.location.href='home.php?idachievement=$idachievement   &result=updated';
             </script>";
     }
-
     $mysqli->close();
 ?>

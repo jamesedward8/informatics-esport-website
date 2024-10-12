@@ -7,8 +7,8 @@ if ($mysqli->connect_errno) {
 }
 
 $role = isset($_SESSION['profile']) ? $_SESSION['profile'] : null;
-
 ?>
+
 <header class="header">
     <div class="containerLogo">
         <img src="img/logo.png" alt="logo" class="logo">
@@ -28,11 +28,23 @@ $role = isset($_SESSION['profile']) ? $_SESSION['profile'] : null;
         </div>
         <div class="nav-kanan">
             <?php if (isset($_SESSION['username'])): ?>
-                <!-- <a href='profile.php'>Hi, <?php echo htmlspecialchars($_SESSION['username']) ?>!</> -->
-                <a href="logout.php">LOGOUT</a>
+                <a href="logout.php" id="logout">LOGOUT</a>
             <?php else: ?>
                 <button class="btn-login" onclick="window.location.href='login.php';">LOGIN</button>
             <?php endif; ?>
         </div>
     </div>
 </header>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#logout').click(function(e) {
+            var confirmation = confirm("Are you sure you want to log out?");
+            
+            if (!confirmation) {
+                e.preventDefault();     
+            }
+        });
+    });
+</script>

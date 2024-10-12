@@ -6,9 +6,6 @@
         exit();
     }
 
-
-    $user = "admin";
-
     if (isset($_POST['btnEditEv'])) {
         extract($_POST);
 
@@ -24,6 +21,5 @@
                 window.location.href='event.php?idevent=$idevent&result=updated';
             </script>";
     }
-
     $mysqli->close();
 ?>

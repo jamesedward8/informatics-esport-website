@@ -20,12 +20,13 @@
                 echo "<script>
                         alert('Account created successfully!');
                         window.location.href='login.php?result=success';
-                    </script>";
-            } else {
+                     </script>";
+            } 
+            else {
                 echo "<script>
                         alert('Error creating account. Please try again.');
                         window.history.back();
-                    </script>";
+                     </script>";
             }
             $stmt->close();
         }
@@ -33,7 +34,7 @@
             echo "<script>
                     alert('Passwords do not match. Please make sure both fields are identical.');
                     window.history.back();
-                </script>";
+                 </script>";
         }
     }
     $mysqli->close();
