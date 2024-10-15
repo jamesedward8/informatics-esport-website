@@ -38,35 +38,41 @@
                                 $stmt->execute();
                                 $res = $stmt->get_result();
                                 $event = $res->fetch_assoc();
+
+                                if (!$event) {
+                                    echo "<h1 style='color:red;'>Event does not exist.</h1>";
+                                }
                             }
                         }
                     ?>
 
-                    <form action="edit_event_proses.php" method="POST">
-                        <input type="hidden" name="idevent" value="<?php echo $event['idevent'] ?>">
-                        <div class="mb-3">
-                            <label for="name" class="form-label, label-edit-event">Event Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                            <input type="text" class="form-control, input-edit-event" name="name" id="name" required value="<?php echo $event['name'] ?>" >
-                        </div>
-                        <br><br>
+                    <?php if ($event): ?>
+                        <form action="edit_event_proses.php" method="POST">
+                            <input type="hidden" name="idevent" value="<?php echo $event['idevent'] ?>">
+                            <div class="mb-3">
+                                <label for="name" class="form-label, label-edit-event">Event Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                <input type="text" class="form-control, input-edit-event" name="name" id="name" required value="<?php echo $event['name'] ?>" >
+                            </div>
+                            <br><br>
 
-                        <div class="mb-3">
-                            <label for="date" class="form-label, label-edit-event">Date:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                            <input type="date" class="form-control, input-edit-event" name="date" id="date" required value="<?php echo $event['date'] ?>" >
-                        </div>
-                        <br><br>
+                            <div class="mb-3">
+                                <label for="date" class="form-label, label-edit-event">Date:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                <input type="date" class="form-control, input-edit-event" name="date" id="date" required value="<?php echo $event['date'] ?>" >
+                            </div>
+                            <br><br>
 
-                        <div class="mb-3">
-                            <label for="desc" class="form-label, label-edit-event">Description:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                            <br>
-                            <textarea class="form-control, ta-edit-event" id="desc" name="desc" rows="5" required><?php echo $event['description'] ?></textarea>
-                        </div>
-                        <br><br>
+                            <div class="mb-3">
+                                <label for="desc" class="form-label, label-edit-event">Description:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                <br>
+                                <textarea class="form-control, ta-edit-event" id="desc" name="desc" rows="5" required><?php echo $event['description'] ?></textarea>
+                            </div>
+                            <br><br>
 
-                        <div class="mb-3">
-                            <input type="submit" class="btn-edit-event" value="Save Changes" name="btnEditEv">
-                        </div>      
-                    </form>
+                            <div class="mb-3">
+                                <input type="submit" class="btn-edit-event" value="Save Changes" name="btnEditEv">
+                            </div>      
+                        </form>
+                    <?php endif;?>
                 </div>
             </article>
             <?php

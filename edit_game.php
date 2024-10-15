@@ -38,29 +38,35 @@ session_start();
                                 $stmt->execute();
                                 $res = $stmt->get_result();
                                 $game = $res->fetch_assoc();
+
+                                if (!$game) {
+                                    echo "<h1 style='color:red;'>Game does not exist.</h1>";
+                                }
                             }
                         }
                     ?>
 
-                    <form action="edit_game_proses.php" method="POST">
-                        <input type="hidden" name="idgame" value="<?php echo $game['idgame'] ?>">
-                        <div class="mb-3">
-                            <label for="name" class="form-label, label-edit-event">Game Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                            <input type="text" class="form-control, input-edit-event" name="name" id="name" required value="<?php echo $game['name'] ?>">
-                        </div>
-                        <br><br>
+                    <?php if ($game): ?>
+                        <form action="edit_game_proses.php" method="POST">
+                            <input type="hidden" name="idgame" value="<?php echo $game['idgame'] ?>">
+                            <div class="mb-3">
+                                <label for="name" class="form-label, label-edit-event">Game Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                <input type="text" class="form-control, input-edit-event" name="name" id="name" required value="<?php echo $game['name'] ?>">
+                            </div>
+                            <br><br>
 
-                        <div class="mb-3">
-                            <label for="desc" class="form-label, label-edit-event">Description:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                            <br>
-                            <textarea class="form-control, ta-edit-event" id="desc" name="desc" rows="5" required><?php echo $game['description'] ?></textarea>
-                        </div>
-                        <br><br>
+                            <div class="mb-3">
+                                <label for="desc" class="form-label, label-edit-event">Description:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                <br>
+                                <textarea class="form-control, ta-edit-event" id="desc" name="desc" rows="5" required><?php echo $game['description'] ?></textarea>
+                            </div>
+                            <br><br>
 
-                        <div class="mb-3">
-                            <input type="submit" class="btn-edit-event" value="Save Changes" name="btnEditEv">
-                        </div>      
-                    </form>
+                            <div class="mb-3">
+                                <input type="submit" class="btn-edit-event" value="Save Changes" name="btnEditEv">
+                            </div>      
+                        </form>
+                    <?php endif;?>
                 </div>
             </article>
             <?php

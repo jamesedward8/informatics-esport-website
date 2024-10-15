@@ -40,70 +40,76 @@
                             $stmt->execute();
                             $res = $stmt->get_result();
                             $achievement = $res->fetch_assoc();
+
+                            if (!$achievement) {
+                                echo "<h1 style='color:red;'>Achievement does not exist.</h1>";
+                            }
                         }
                     ?>
 
-                    <form action="edit_achievement_proses.php" method="POST">
-                        <input type="hidden" name="idachievement" value="<?php echo $achievement['idachievement'] ?>">
-                        
-                        <div class="mb-3">
-                            <label for="name" class="form-label, label-add-event">Achievement Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                            <input type="text" name="name" class="form-control, input-add-event" id="name" value="<?php echo $achievement['name']; ?>" placeholder="Enter achievement here..." required>
-                        </div>
-                        <br><br>
+                    <?php if ($achievement): ?>
+                        <form action="edit_achievement_proses.php" method="POST">
+                            <input type="hidden" name="idachievement" value="<?php echo $achievement['idachievement'] ?>">
+                            
+                            <div class="mb-3">
+                                <label for="name" class="form-label, label-add-event">Achievement Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                <input type="text" name="name" class="form-control, input-add-event" id="name" value="<?php echo $achievement['name']; ?>" placeholder="Enter achievement here..." required>
+                            </div>
+                            <br><br>
 
-                        <div class="mb-3">
-                            <label for="idgame" class="form-label, label-add-event">Game Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                            <select name="idgame" id="idgame" required>
-                                <option value="" disabled>Pilih Game</option>
-                                <?php  
-                                    $stmt = $mysqli->prepare("SELECT * from game");
-                                    $stmt->execute();
-                                    $res = $stmt->get_result();
+                            <div class="mb-3">
+                                <label for="idgame" class="form-label, label-add-event">Game Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                <select name="idgame" id="idgame" required>
+                                    <option value="" disabled>Pilih Game</option>
+                                    <?php  
+                                        $stmt = $mysqli->prepare("SELECT * from game");
+                                        $stmt->execute();
+                                        $res = $stmt->get_result();
 
-                                    while($row = $res->fetch_assoc()) {
-                                        $selected = ($row['idgame'] == $achievement['idgame']) ? 'selected' : '';
-                                        echo "<option value='".$row['idgame']."' $selected>".$row['name']."</option>";
-                                    }
-                                ?>
-                            </select>
-                        </div>
-                        <br><br>
+                                        while($row = $res->fetch_assoc()) {
+                                            $selected = ($row['idgame'] == $achievement['idgame']) ? 'selected' : '';
+                                            echo "<option value='".$row['idgame']."' $selected>".$row['name']."</option>";
+                                        }
+                                    ?>
+                                </select>
+                            </div>
+                            <br><br>
 
-                        <div class="mb-3">
-                            <label for="idteam" class="form-label, label-add-event">Team Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                            <select name="idteam" id="idteam" required>
-                                <option value="" disabled>Pilih Team</option>
-                                <?php  
-                                    $stmt = $mysqli->prepare("SELECT * FROM team");
-                                    $stmt->execute();
-                                    $res = $stmt->get_result();
+                            <div class="mb-3">
+                                <label for="idteam" class="form-label, label-add-event">Team Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                <select name="idteam" id="idteam" required>
+                                    <option value="" disabled>Pilih Team</option>
+                                    <?php  
+                                        $stmt = $mysqli->prepare("SELECT * FROM team");
+                                        $stmt->execute();
+                                        $res = $stmt->get_result();
 
-                                    while($team = $res->fetch_assoc()) {
-                                        $selected = ($team['idteam'] == $achievement['idteam']) ? 'selected' : '';
-                                        echo "<option value='".$team['idteam']."' data-game='".$team['idgame']."' $selected>".$team['name']."</option>";
-                                    }
-                                ?>
-                            </select>
-                        </div>
-                        <br><br>
+                                        while($team = $res->fetch_assoc()) {
+                                            $selected = ($team['idteam'] == $achievement['idteam']) ? 'selected' : '';
+                                            echo "<option value='".$team['idteam']."' data-game='".$team['idgame']."' $selected>".$team['name']."</option>";
+                                        }
+                                    ?>
+                                </select>
+                            </div>
+                            <br><br>
 
-                        <div class="mb-3">
-                            <label for="date" class="form-label, label-add-event">Date:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                            <input type="date" name="date" class="form-control, input-add-event" id="date" value="<?php echo $achievement['date']; ?>" required>
-                        </div>
-                        <br><br>
+                            <div class="mb-3">
+                                <label for="date" class="form-label, label-add-event">Date:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                <input type="date" name="date" class="form-control, input-add-event" id="date" value="<?php echo $achievement['date']; ?>" required>
+                            </div>
+                            <br><br>
 
-                        <div class="mb-3">
-                            <label for="desc" class="form-label, label-add-event">Description:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label><br>
-                            <textarea class="form-control, ta-add-event" name="desc" id="desc" rows="5" placeholder="Enter event description here..." required><?php echo $achievement['description']; ?></textarea>
-                        </div>
-                        <br><br>
+                            <div class="mb-3">
+                                <label for="desc" class="form-label, label-add-event">Description:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label><br>
+                                <textarea class="form-control, ta-add-event" name="desc" id="desc" rows="5" placeholder="Enter event description here..." required><?php echo $achievement['description']; ?></textarea>
+                            </div>
+                            <br><br>
 
-                        <div class="mb-3">
-                            <input type="submit" class="btn-add-event" value="Save Changes" name="btnEditEv" id="confirmation">
-                        </div>      
-                    </form>
+                            <div class="mb-3">
+                                <input type="submit" class="btn-add-event" value="Save Changes" name="btnEditEv" id="confirmation">
+                            </div>      
+                        </form>
+                    <?php endif;?>
                 </div>
             </article>
 
@@ -114,43 +120,43 @@
     </body>
     
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-        <script>
-            $(document).ready(function() {
-                function filterTeams() {
-                    var selectedGame = $('#idgame').val();
+    <script>
+        $(document).ready(function() {
+            function filterTeams() {
+                var selectedGame = $('#idgame').val();
 
-                    $('#idteam option').each(function() {
-                        var teamGame = $(this).data('game'); 
-                        if (teamGame == selectedGame || !selectedGame) {
-                            $(this).show();
-                        } else {
-                            $(this).hide();
-                        }
-                    });
-
-                    if ($('#idteam option:selected').data('game') != selectedGame) {
-                        $('#idteam').val('');
+                $('#idteam option').each(function() {
+                    var teamGame = $(this).data('game'); 
+                    if (teamGame == selectedGame || !selectedGame) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
                     }
+                });
+
+                if ($('#idteam option:selected').data('game') != selectedGame) {
+                    $('#idteam').val('');
                 }
+            }
 
+            filterTeams();
+
+            $('#idgame').change(function() {
                 filterTeams();
-
-                $('#idgame').change(function() {
-                    filterTeams();
-                });
-
-                $('form').submit(function(e) {
-                    if (this.checkValidity()) {
-                        var confirmation = confirm("Are you sure you want to edit this achievement?");
-                        if (!confirmation) {
-                            e.preventDefault(); 
-                        }
-                    } 
-                    else {
-                        e.preventDefault(); 
-                        alert('Please fill in all required fields.'); 
-                    }
-                });
             });
-        </script>
+
+            $('form').submit(function(e) {
+                if (this.checkValidity()) {
+                    var confirmation = confirm("Are you sure you want to edit this achievement?");
+                    if (!confirmation) {
+                        e.preventDefault(); 
+                    }
+                } 
+                else {
+                    e.preventDefault(); 
+                    alert('Please fill in all required fields.'); 
+                }
+            });
+        });
+    </script>
 </html>

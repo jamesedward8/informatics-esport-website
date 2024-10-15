@@ -401,6 +401,7 @@ td {
         justify-content: center;
     }
 }
+
 .pagination {
     display: flex; 
     justify-content: center;
@@ -427,4 +428,3 @@ td {
     background-color: orange; 
     color: white; 
 }
-

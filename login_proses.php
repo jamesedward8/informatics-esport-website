@@ -24,11 +24,11 @@
                 echo "<script>window.location.href='home.php?login=success';</script>";
             } 
             else {
-                echo "<script>alert('Incorrect username or password!'); window.history.back();</script>";
+                echo "<script>alert('Incorrect username or password!'); window.location.href='login.php';</script>";
             }
         } 
         else {
-            echo "<script>alert('User not found!'); window.history.back();</script>";
+            echo "<script>alert('Incorrect username or password!'); window.location.href='login.php';</script>";
         }
     }
     $mysqli->close();

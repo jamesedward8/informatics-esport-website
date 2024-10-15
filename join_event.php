@@ -24,6 +24,11 @@ $result_team = $mysqli->query("
 $limit = 3;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
+
+$resultTotal = $mysqli->query("SELECT COUNT(*) AS total FROM event_teams WHERE idevent = $idevent");
+$rowTotal = $resultTotal->fetch_assoc();
+$totalData = $rowTotal['total'];
+$totalPages = ceil($totalData / $limit);
 ?>
 
 <!DOCTYPE html>
@@ -69,8 +74,8 @@ $offset = ($page - 1) * $limit;
                     <div class="content-submenu-page">
                         <h2 class="h2-sub-content-title">Teams that have joined this event:</h2>
                         <?php
-                        $stmt = $mysqli->prepare("SELECT t.name, t.idteam, et.idevent FROM event_teams et JOIN team t ON et.idteam = t.idteam WHERE et.idevent = ?");
-                        $stmt->bind_param("i", $idevent);
+                        $stmt = $mysqli->prepare("SELECT t.name, t.idteam, et.idevent FROM event_teams et JOIN team t ON et.idteam = t.idteam WHERE et.idevent = ? LIMIT ? OFFSET ?");
+                        $stmt->bind_param("iii", $idevent, $limit, $offset);
                         $stmt->execute();
                         $result = $stmt->get_result();
 
@@ -101,13 +106,13 @@ $offset = ($page - 1) * $limit;
                     <div class="pagination">
                         <?php
                         if ($page > 1) {
-                            echo "<a href='?page=1' class='page-btn'>First</a>";
+                            echo "<a href='?idevent=$idevent&page=1' class='page-btn'>First</a>";
                         }
                         for ($i = 1; $i <= $totalPages; $i++) {
-                            echo "<a href='?page=$i' class='page-btn " . (($i == $page) ? 'active' : '') . "'>$i</a>";
+                            echo "<a href='?idevent=$idevent&page=$i' class='page-btn " . (($i == $page) ? 'active' : '') . "'>$i</a>";
                         }
                         if ($page < $totalPages) {
-                            echo "<a href='?page=$totalPages' class='page-btn'>Last</a>";
+                            echo "<a href='?idevent=$idevent&page=$totalPages' class='page-btn'>Last</a>";
                         }
                         ?>
                     </div>

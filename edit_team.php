@@ -39,40 +39,45 @@ session_start();
                             $stmt->execute();
                             $res = $stmt->get_result();
                             $team = $res->fetch_assoc();
-                            $game[] = $team["idgame"]; 
+
+                            if (!$team) {
+                                echo "<h1 style='color:red;'>Team does not exist.</h1>";
+                            }
                         }
                     ?>
 
-                    <form action="edit_team_proses.php" method="POST">
-                        <input type="hidden" name="idteam" value="<?php echo $team['idteam'] ?>">
-                        <div class="mb-3">
-                            <label for="name" class="form-label, label-edit-event">Team Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                            <input type="text" class="form-control, input-edit-event" name="name" id="name" value="<?php echo $team['name'] ?>" required>
-                        </div>
-                        <br><br>
+                    <?php if ($team): ?>
+                        <form action="edit_team_proses.php" method="POST">
+                            <input type="hidden" name="idteam" value="<?php echo $team['idteam'] ?>">
+                            <div class="mb-3">
+                                <label for="name" class="form-label, label-edit-event">Team Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                <input type="text" class="form-control, input-edit-event" name="name" id="name" value="<?php echo $team['name'] ?>" required>
+                            </div>
+                            <br><br>
 
-                        <div class="mb-3">
-                            <label for="idgame" class="form-label, label-add-event">Game Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                            <select name="idgame" id="idgame" required>
-                                <option value="">Pilih Game</option>
-                                <?php
-                                    $stmt = $mysqli->prepare("SELECT * FROM game");
-                                    $stmt->execute();
-                                    $res = $stmt->get_result();
+                            <div class="mb-3">
+                                <label for="idgame" class="form-label, label-add-event">Game Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                <select name="idgame" id="idgame" required>
+                                    <option value="">Pilih Game</option>
+                                    <?php
+                                        $stmt = $mysqli->prepare("SELECT * FROM game");
+                                        $stmt->execute();
+                                        $res = $stmt->get_result();
 
-                                    while ($row = $res->fetch_assoc()) {
-                                        $selected = ($row['idgame'] == $team['idgame']) ? 'selected' : '';
-                                        echo "<option value='{$row['idgame']}' {$selected}>{$row['name']}</option>";
-                                    }
-                                ?>
-                            </select>
-                        </div>
-                        <br><br>
+                                        while ($row = $res->fetch_assoc()) {
+                                            $selected = ($row['idgame'] == $team['idgame']) ? 'selected' : '';
+                                            echo "<option value='{$row['idgame']}' {$selected}>{$row['name']}</option>";
+                                        }
+                                    ?>
+                                </select>
+                            </div>
+                            <br><br>
 
-                        <div class="mb-3">
-                            <input type="submit" class="btn-edit-event" value="Save Changes" name="btnEditEv">
-                        </div>      
-                    </form>
+                            <div class="mb-3">
+                                <input type="submit" class="btn-edit-event" value="Save Changes" name="btnEditEv">
+                            </div>      
+                        </form>
+                    <?php endif;?>
                 </div>
             </article>
             <?php
