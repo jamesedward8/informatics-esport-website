@@ -149,6 +149,18 @@ main.content {
     z-index: -1;
 }
 
+.h2-sub-content-title {
+    color: rgb(255, 165, 91);
+    margin-top: 0;
+}
+
+.p-sub-content-title {
+    margin-top: auto;
+    color: red;
+    font-size: 20px;
+    z-index: -1;
+}
+
 .content-page,
 .content-submenu-page {
     display: flex;
@@ -158,6 +170,10 @@ main.content {
 }
 
 .content-submenu-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
     margin-top: 50px;
     margin-bottom: 50px;
 }

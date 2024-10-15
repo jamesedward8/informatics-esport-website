@@ -62,7 +62,7 @@
                     <br><br>
                     
                     <div class="content-submenu-page"> 
-                        <h2>Teams that have joined this event:</h2>
+                        <h2 class="h2-sub-content-title">Teams that have joined this event:</h2>
                         <?php
                             $stmt = $mysqli->prepare("SELECT t.name, t.idteam, et.idevent FROM event_teams et JOIN team t ON et.idteam = t.idteam WHERE et.idevent = ?");
                             $stmt->bind_param("i", $idevent);
@@ -86,7 +86,8 @@
                                 echo "</tbody>";
                                 echo "</table>";
                             } else {
-                                echo "<p>No teams have joined this event yet.</p>";
+                                echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+                                echo "<p class='p-sub-content-title'>No teams have joined this event yet.</p>";
                             }
 
                             $stmt->close();
