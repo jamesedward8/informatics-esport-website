@@ -157,7 +157,7 @@
                                                 echo "<td><span style='color: green; font-weight: bold;'>Approved</span></td>";
                                             } 
                                             else if ($proposal['status'] == 'rejected') {
-                                                echo "<td><span style='color: red; font-weight: bold;'>Rejected</span></td>";
+                                                echo "<td><span style='color: darkred; font-weight: bold;'>Rejected</span></td>";
                                             } 
                                             else {
                                                 if (isset($accepted_games[$row['idgame']])) {
@@ -169,7 +169,7 @@
                                             }
                                         } else {
                                             if (isset($accepted_games[$row['idgame']])) {
-                                                echo "<td><span style='color: darkred; font-weight: bold;'>Not Eligible to Join</span></td>";
+                                                echo "<td><span style='color: red; font-weight: bold;'>Not Eligible to Join</span></td>";
                                             } 
                                             else {
                                                 echo "<td><a class='td-btn-edit' href='join_team.php?idteam=" . $row['idteam'] . "&idmember=" . $iduser . "' style='display:" . (($role == "member") ? "block" : "none") . ";' name='btn-Join'>Join</a></td>";
