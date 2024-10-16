@@ -46,17 +46,6 @@ $totalPages = ceil($totalData / $limit);
     include('header.php');
     ?>
 
-    <?php
-    if ($role != "admin") {
-    ?>
-        <div class="video-container">
-            <video width="100%" height="auto" autoplay loop muted>
-                <source src="img/VidHome1.mp4" type="video/mp4">
-            </video>
-        </div>
-    <?php
-    }
-    ?>
 
     <main class="content-home">
         <article>
