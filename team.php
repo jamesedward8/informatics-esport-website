@@ -83,7 +83,7 @@
                             echo "<tr>
                                     <th>Team Name</th>
                                     <th>Game Name</th>
-                                    <th colspan=2>Action</th>
+                                    <th colspan=3>Action</th>
                                 </tr>";
                         } else if ($role == "member") {
                             echo "<tr>
@@ -123,6 +123,7 @@
                                     echo "<tr>
                                             <td>" . $row['namateam'] . "</td>
                                             <td>" . $row['namagame'] . "</td>
+                                            <td><a class='td-btn-view-pp' href='view_pp.php?idteam=". $row['idteam'] ."' style='display:" . (($role == "admin") ? "block" : "none") . ";'>View Profile</a></td>
                                             <td><a class='td-btn-edit' href='edit_team.php?idteam=" . $row['idteam'] . "' style='display:" . (($role == "admin") ? "block" : "none") . ";'>Edit</a></td>
                                             <td><a class='td-btn-delete' href='delete_team.php?idteam=" . $row['idteam'] . "' style='display:" . (($role == "admin") ? "block" : "none") . ";'>Delete</a></td>
                                          </tr>";
