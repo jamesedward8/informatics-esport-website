@@ -1,4 +1,4 @@
-<?php 
+<?php
     session_start();
     $mysqli = new mysqli("localhost", "root", "", "esport");
 
@@ -8,58 +8,18 @@
     }
 
     $role = isset($_SESSION['role']) ? $_SESSION['role'] : null;
-    $user = isset($_SESSION['user']) ? $_SESSION['user'] : null;
-    $iduser = isset($_SESSION['iduser']) ? $_SESSION['iduser'] : null;
-
+    $user = isset($_SESSION['username']) ? $_SESSION['username'] : null;
     $idteam = isset($_GET['idteam']) ? $_GET['idteam'] : null;
-    
-    // Handle profile picture upload
-    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['profile_picture']) && $role == 'admin') {
-        $target_dir = "uploads/teams/";
-        $target_file = $target_dir . "team_" . $idteam . ".jpg"; // Rename to team ID for uniqueness
-        $uploadOk = 1;
-        $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
-        // Check if image file is a real image
-        $check = getimagesize($_FILES['profile_picture']['tmp_name']);
-        if ($check === false) {
-            echo "File is not an image.";
-            $uploadOk = 0;
-        }
-
-        // Allow only certain formats
-        if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg") {
-            echo "Only JPG, JPEG, and PNG files are allowed.";
-            $uploadOk = 0;
-        }
-
-        // Check file size (limit to 2MB)
-        if ($_FILES['profile_picture']['size'] > 2000000) {
-            echo "Your file is too large. Max size is 2MB.";
-            $uploadOk = 0;
-        }
-
-        // Attempt to upload if no errors
-        if ($uploadOk == 1) {
-            if (move_uploaded_file($_FILES['profile_picture']['tmp_name'], $target_file)) {
-                echo "The profile picture has been uploaded.";
-            } else {
-                echo "Sorry, there was an error uploading your file.";
-            }
-        }
-    }
-
-    // Get team name and check if profile picture exists
     $stmt_team_name = $mysqli->prepare("SELECT name FROM team WHERE idteam = ?");
-    $stmt_team_name->bind_param('i', $idteam);
+    $stmt_team_name->bind_param("i", $idteam);
     $stmt_team_name->execute();
     $res_team_name = $stmt_team_name->get_result();
-    $team = $res_team_name->fetch_assoc();
-    $team_name = $team['name'] ?? 'Unknown Team';
+    $team_name = $res_team_name->fetch_assoc()['name'];
 
-    $profile_picture = "uploads/teams/team_" . $idteam . ".jpg";
+    $profile_picture = "uploads/" . $idteam . ".jpg";
     if (!file_exists($profile_picture)) {
-        $profile_picture = "images/default_profile.png"; // Default image if no upload
+        $profile_picture = "img/default_pp.jpg";
     }
 ?>
 
@@ -82,22 +42,71 @@
                 <h1 class="h1-content-title">View Team <?= htmlspecialchars($team_name) ?>'s Profile</h1>
             </div>
             <div class="content-page">
-                <!-- Display Profile Picture -->
-                <div class="profile-picture">
-                    <img src="<?= htmlspecialchars($profile_picture) ?>" alt="" style="width: 200px; height: 200px; border-radius: 50%;">
+                <!-- Profile Picture Display -->
+                <div class="profile-container">
+                    <div class="profile-picture">
+                        <img id="profile-img" src="<?= htmlspecialchars($profile_picture) ?>" alt="Profile Picture">
+                    </div>
+                    <?php if ($role === 'admin'): ?>
+                        <!-- Profile Picture Upload Form -->
+                        <form id="upload-form" enctype="multipart/form-data" class="upload-form">
+                            <label for="profile_picture">Change</label>
+                            <input type="file" name="profile_picture" id="profile_picture" accept=".jpg" required>
+                            <button type="button" onclick="uploadImage()">Save</button> 
+                            <input type="hidden" name="idteam" value="<?= htmlspecialchars($idteam) ?>"> <!-- Send idteam as hidden input -->
+                            <input type="hidden" name="role" value="<?= htmlspecialchars($role) ?>"> <!-- Send role as hidden input -->
+                        </form>
+                    <?php endif; ?>
                 </div>
-
-                <?php if ($role == 'admin'): ?>
-                    <!-- Profile Picture Upload Form (only visible to admins) -->
-                    <form action="view_pp.php?idteam=<?= $idteam ?>" method="POST" enctype="multipart/form-data">
-                        <label for="profile_picture" style="color:burlywood;">Change Profile Picture:</label>
-                        <input type="file" name="profile_picture" id="profile_picture" accept="uploads/*" required>
-                        <button type="submit">Upload</button>
-                    </form>
-                <?php endif; ?>
             </div>
         </article>
     </main>
     <?php include('footer.php'); ?>
+
+    <!-- JavaScript for AJAX upload and preview -->
+    <script>
+        // Function to preview the selected image by updating the main profile image
+        document.getElementById('profile_picture').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file && file.type === 'image/jpeg') {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profile-img').src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            } else {
+                alert('Please select a valid JPG file.');
+            }
+        });
+
+        // AJAX function to upload the image
+        function uploadImage() {
+            const formData = new FormData(document.getElementById('upload-form'));
+            formData.append('idteam', '<?= htmlspecialchars($idteam) ?>'); // Explicitly append idteam
+
+            fetch('upload_pp.php', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json(); // Parse response as JSON
+            })
+            .then(data => {
+                if (data.status === 'success') {
+                    document.getElementById('profile-img').src = data.imagePath + '?' + new Date().getTime(); // Force image refresh
+                    alert(data.message);
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("An error occurred. Please check the console for details.");
+            });
+        }
+    </script>
 </body>
 </html>

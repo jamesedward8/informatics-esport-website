@@ -423,42 +423,63 @@ td {
 }
 
 /* Profile Picture Display */
-.profile-picture {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 20px;
+.profile-container {
+    margin-top: 50px;
+    text-align: center;
 }
 
-.profile-picture img {
+.profile-picture {
     width: 200px;
     height: 200px;
     border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto;
+    border: 4px solid orange; /* Optional border for highlight */
+}
+
+.profile-picture img {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    border: 4px solid orange; /* Optional: for a highlighted border */
+    border-radius: 50%;
 }
 
-/* Profile Picture Upload Form */
-form input[type="file"] {
+.upload-form {
+    margin-top: 15px;
+}
+
+.upload-form label {
     display: block;
-    margin: 20px auto;
+    margin-bottom: 20px;
+    background-color: rgba(0, 0, 0, 0.3);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold;
     font-size: 16px;
-    padding: 10px;
+    cursor: pointer;
 }
 
-form button[type="submit"] {
+.upload-form label:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.upload-form input[type="file"] {
+    display: none;
+}
+
+.upload-form button {
     background-color: orange;
     color: white;
-    font-size: 16px;
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
+    font-weight: bold;
+    font-size: 18px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    font-family: "Inria Sans", sans-serif;
-    font-weight: 700;
 }
 
-form button[type="submit"]:hover {
-    background-color: #cc7a00; /* Darker orange on hover */
+.upload-form button:hover {
+    background-color: #cc7a00;
 }
