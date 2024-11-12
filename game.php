@@ -1,4 +1,5 @@
 <?php 
+require_once("gameClass.php");
 session_start();
 $mysqli = new mysqli("localhost", "root", "", "esport");
 
@@ -18,6 +19,8 @@ $resultTotal = $mysqli->query("SELECT COUNT(*) AS total FROM game");
 $rowTotal = $resultTotal->fetch_assoc();
 $totalData = $rowTotal['total'];
 $totalPages = ceil($totalData / $limit);
+
+
 ?>
 
 <!DOCTYPE html>
@@ -51,10 +54,13 @@ $totalPages = ceil($totalData / $limit);
                 </div>
                 <div class="content-page">
                     <?php
-                        $stmt = $mysqli->prepare("SELECT * FROM game LIMIT ? OFFSET ?");
-                        $stmt->bind_param('ii', $limit, $offset); 
-                        $stmt->execute();
-                        $res = $stmt->get_result();
+                        // $stmt = $mysqli->prepare("SELECT * FROM game LIMIT ? OFFSET ?");
+                        // $stmt->bind_param('ii', $limit, $offset); 
+                        // $stmt->execute();
+                        // $res = $stmt->get_result();
+                        $game = new game();
+                        $resGame = $game->getGame($offset,$limit);  
+
 
                         echo "<br><br>";
                         echo "<table class='tableEvent'>";
@@ -74,13 +80,13 @@ $totalPages = ceil($totalData / $limit);
                         echo "</thead>";
                         echo "<tbody>";
 
-                        if ($res->num_rows == 0) {
+                        if ($resGame->num_rows == 0) {
                             echo "<tr>
                                     <td colspan='3'>No Game Available, Stay Tuned!</td>
                                  </tr>";
                         } 
                         else {
-                            while ($row = $res->fetch_assoc()) {
+                            while ($row = $resGame->fetch_assoc()) {
                                 if ($role == "admin") {
                                     echo "<tr>
                                             <td>" . $row['name'] . "</td>

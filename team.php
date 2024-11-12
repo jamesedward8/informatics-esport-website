@@ -6,7 +6,7 @@
         echo "Failed to connect to MySQL: " . $mysqli->connect_error;
         exit();
     }
-
+    require_once("teamClass.php");
     $role = isset($_SESSION['profile']) ? $_SESSION['profile'] : null;
     $user = isset($_SESSION['username']) ? $_SESSION['username'] : null;
     $iduser = isset($_SESSION['idmember']) ? $_SESSION['idmember'] : null;
@@ -68,13 +68,16 @@
                 </div>
                 <div class="content-page">
                     <?php
-                        $stmt = $mysqli->prepare("SELECT t.name as namateam, g.name as namagame, t.idteam, g.idgame 
-                                                    FROM team t 
-                                                    JOIN game g ON t.idgame = g.idgame 
-                                                    LIMIT ? OFFSET ?");
-                        $stmt->bind_param('ii', $limit, $offset);
-                        $stmt->execute();
-                        $res = $stmt->get_result();
+                        // $stmt = $mysqli->prepare("SELECT t.name as namateam, g.name as namagame, t.idteam, g.idgame 
+                        //                             FROM team t 
+                        //                             JOIN game g ON t.idgame = g.idgame 
+                        //                             LIMIT ? OFFSET ?");
+                        // $stmt->bind_param('ii', $limit, $offset);
+                        // $stmt->execute();
+                        // $res = $stmt->get_result();
+
+                        $team = new team();
+                        $resTeam = $team->getTeam($offset,$limit);  
 
                         echo "<br><br>";
                         echo "<table class='tableEvent'>";
@@ -100,7 +103,7 @@
                         echo "</thead>";
                         echo "<tbody>";
 
-                        if ($res->num_rows == 0) {
+                        if ($resTeam->num_rows == 0) {
                             echo "<tr>
                                     <td colspan='5'>No Team Available, Stay Tuned!</td>
                                 </tr>";
@@ -118,7 +121,7 @@
                                 $accepted_games[$game_row['idgame']] = $game_row['idteam'];
                             }
 
-                            while ($row = $res->fetch_assoc()) {
+                            while ($row = $resTeam->fetch_assoc()) {
                                 if ($role == "admin") {
                                     echo "<tr>
                                             <td>" . $row['namateam'] . "</td>
@@ -133,51 +136,51 @@
                                             <td>" . $row['namateam'] . "</td>
                                             <td>" . $row['namagame'] . "</td>";
 
-                                    $stmt1 = $mysqli->prepare("SELECT jp.idteam, jp.idmember 
-                                                                            FROM join_proposal jp 
-                                                                            WHERE jp.idteam = ? AND jp.status = 'waiting' AND jp.idmember = ?");
-                                    $stmt1->bind_param('ii', $row['idteam'], $iduser);
-                                    $stmt1->execute();
-                                    $res_jp_check = $stmt1->get_result();
+                                    // $stmt1 = $mysqli->prepare("SELECT jp.idteam, jp.idmember 
+                                    //                                         FROM join_proposal jp 
+                                    //                                         WHERE jp.idteam = ? AND jp.status = 'waiting' AND jp.idmember = ?");
+                                    // $stmt1->bind_param('ii', $row['idteam'], $iduser);
+                                    // $stmt1->execute();
+                                    // $res_jp_check = $stmt1->get_result();
 
-                                    if ($res_jp_check->num_rows > 0) {
-                                        echo "<td><a class='td-btn-edit' href='join_team_status.php?idteam=" . $row['idteam'] . "&idmember=" . $iduser . "' style='display:" . (($role == "member") ? "block" : "none") . ";'>See Status</a></td>";
-                                    } 
-                                    else {
-                                        $stmt2 = $mysqli->prepare("SELECT jp.status 
-                                                                                FROM join_proposal jp 
-                                                                                WHERE jp.idteam = ? AND jp.idmember = ?");
-                                        $stmt2->bind_param('ii', $row['idteam'], $iduser);
-                                        $stmt2->execute();
-                                        $res_status_check = $stmt2->get_result();
+                                    // if ($res_jp_check->num_rows > 0) {
+                                    //     echo "<td><a class='td-btn-edit' href='join_team_status.php?idteam=" . $row['idteam'] . "&idmember=" . $iduser . "' style='display:" . (($role == "member") ? "block" : "none") . ";'>See Status</a></td>";
+                                    // } 
+                                    // else {
+                                    //     $stmt2 = $mysqli->prepare("SELECT jp.status 
+                                    //                                             FROM join_proposal jp 
+                                    //                                             WHERE jp.idteam = ? AND jp.idmember = ?");
+                                    //     $stmt2->bind_param('ii', $row['idteam'], $iduser);
+                                    //     $stmt2->execute();
+                                    //     $res_status_check = $stmt2->get_result();
 
-                                        if ($res_status_check->num_rows > 0) {
-                                            $proposal = $res_status_check->fetch_assoc();
+                                    //     if ($res_status_check->num_rows > 0) {
+                                    //         $proposal = $res_status_check->fetch_assoc();
 
-                                            if ($proposal['status'] == 'approved') {
-                                                echo "<td><span style='color: green; font-weight: bold;'>Approved</span></td>";
-                                            } 
-                                            else if ($proposal['status'] == 'rejected') {
-                                                echo "<td><span style='color: darkred; font-weight: bold;'>Rejected</span></td>";
-                                            } 
-                                            else {
-                                                if (isset($accepted_games[$row['idgame']])) {
-                                                    echo "<td><span style='color: red; font-weight: bold;'>Not Eligible to Join</span></td>";
-                                                } 
-                                                else {
-                                                    echo "<td><a class='td-btn-edit' href='join_team.php?idteam=" . $row['idteam'] . "&idmember=" . $iduser . "' style='display:" . (($role == "member") ? "block" : "none") . ";' name='btn-Join'>Join</a></td>";
-                                                }
-                                            }
-                                        } else {
-                                            if (isset($accepted_games[$row['idgame']])) {
-                                                echo "<td><span style='color: red; font-weight: bold;'>Not Eligible to Join</span></td>";
-                                            } 
-                                            else {
-                                                echo "<td><a class='td-btn-edit' href='join_team.php?idteam=" . $row['idteam'] . "&idmember=" . $iduser . "' style='display:" . (($role == "member") ? "block" : "none") . ";' name='btn-Join'>Join</a></td>";
-                                            }
-                                        }
-                                    }
-                                    echo "</tr>";
+                                    //         if ($proposal['status'] == 'approved') {
+                                    //             echo "<td><span style='color: green; font-weight: bold;'>Approved</span></td>";
+                                    //         } 
+                                    //         else if ($proposal['status'] == 'rejected') {
+                                    //             echo "<td><span style='color: darkred; font-weight: bold;'>Rejected</span></td>";
+                                    //         } 
+                                    //         else {
+                                    //             if (isset($accepted_games[$row['idgame']])) {
+                                    //                 echo "<td><span style='color: red; font-weight: bold;'>Not Eligible to Join</span></td>";
+                                    //             } 
+                                    //             else {
+                                    //                 echo "<td><a class='td-btn-edit' href='join_team.php?idteam=" . $row['idteam'] . "&idmember=" . $iduser . "' style='display:" . (($role == "member") ? "block" : "none") . ";' name='btn-Join'>Join</a></td>";
+                                    //             }
+                                    //         }
+                                    //     } else {
+                                    //         if (isset($accepted_games[$row['idgame']])) {
+                                    //             echo "<td><span style='color: red; font-weight: bold;'>Not Eligible to Join</span></td>";
+                                    //         } 
+                                    //         else {
+                                    //             echo "<td><a class='td-btn-edit' href='join_team.php?idteam=" . $row['idteam'] . "&idmember=" . $iduser . "' style='display:" . (($role == "member") ? "block" : "none") . ";' name='btn-Join'>Join</a></td>";
+                                    //         }
+                                    //     }
+                                    // }
+                                    // echo "</tr>";
                                 } 
                                 else if ($role == null) {
                                     echo "<tr>
