@@ -1,12 +1,5 @@
 <?php
     session_start();
-    $mysqli = new mysqli("localhost", "root", "", "esport");
-
-    if ($mysqli->connect_errno) {
-        echo "Failed to connect to MySQL: " . $mysqli->connect_error;
-        exit();
-    }
-
     $role = isset($_SESSION['profile']) ? $_SESSION['profile'] : null;
     $user = isset($_SESSION['username']) ? $_SESSION['username'] : null;
 ?>

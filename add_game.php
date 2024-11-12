@@ -1,11 +1,5 @@
 <?php
-session_start();
-$mysqli = new mysqli("localhost", "root", "", "esport");
-
-if ($mysqli->connect_errno) {
-    echo "Failed to connect to MySQL: " . $mysqli->connect_error;
-    exit();
-}
+    session_start();
 ?>
 
 <!DOCTYPE html>
@@ -50,9 +44,6 @@ if ($mysqli->connect_errno) {
                     </form>
                 </div>
             </article>
-            <?php
-                $mysqli->close();
-            ?>
         </main>
     </body>
 

@@ -1,10 +1,13 @@
 <?php 
-session_start();
-    $mysqli = new mysqli ("localhost", "root", "", "esport");
+    session_start();
+    require_once("gameClass.php");
 
-    if ($mysqli->connect_errno) {
-        echo "Failed to connect to MySQL: " . $mysqli->connect_error;
-        exit();
+    $game = null;
+    if (isset($_GET['idgame']) && $_GET['idgame'] != null) {
+        $idgame = $_GET['idgame'];
+        
+        $gameInstance = new Game();
+        $game = $gameInstance->getGameById($idgame); 
     }
 ?>
 
@@ -20,44 +23,24 @@ session_start();
         <title>Edit Game - Informatics Esports</title>
     </head>
     <body>
-        <?php  
-            include('header.php');
-        ?>
+        <?php include('header.php'); ?>
         <main class="content">
             <article>
                 <div class="content-title">
                     <h1 class="h1-content-title">Edit Game</h1>
                 </div>
                 <div class="content-page">     
-                    <?php
-                        if (isset($_GET['idgame'])) {
-                            if ($_GET['idgame'] != null) {
-                                $idgame = $_GET['idgame'];
-                                $stmt = $mysqli->prepare("SELECT * FROM game WHERE idgame = ?");
-                                $stmt->bind_param("i", $idgame);
-                                $stmt->execute();
-                                $res = $stmt->get_result();
-                                $game = $res->fetch_assoc();
-
-                                if (!$game) {
-                                    echo "<h1 style='color:red;'>Game does not exist.</h1>";
-                                }
-                            }
-                        }
-                    ?>
-
                     <?php if ($game): ?>
                         <form action="edit_game_proses.php" method="POST">
                             <input type="hidden" name="idgame" value="<?php echo $game['idgame'] ?>">
                             <div class="mb-3">
-                                <label for="name" class="form-label, label-edit-event">Game Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                <label for="name" class="form-label, label-edit-event">Game Name:</label>
                                 <input type="text" class="form-control, input-edit-event" name="name" id="name" required value="<?php echo $game['name'] ?>">
                             </div>
                             <br><br>
 
                             <div class="mb-3">
-                                <label for="desc" class="form-label, label-edit-event">Description:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                                <br>
+                                <label for="desc" class="form-label, label-edit-event">Description:</label>
                                 <textarea class="form-control, ta-edit-event" id="desc" name="desc" rows="5" required><?php echo $game['description'] ?></textarea>
                             </div>
                             <br><br>
@@ -66,12 +49,11 @@ session_start();
                                 <input type="submit" class="btn-edit-event" value="Save Changes" name="btnEditEv">
                             </div>      
                         </form>
-                    <?php endif;?>
+                    <?php else: ?>
+                        <h1 style="color:red;">Game does not exist.</h1>
+                    <?php endif; ?>
                 </div>
             </article>
-            <?php
-                $mysqli->close();
-            ?>
         </main>
     </body>
 
@@ -84,8 +66,7 @@ session_start();
                     if (!confirmation) {
                         e.preventDefault(); 
                     }
-                } 
-                else {
+                } else {
                     e.preventDefault(); 
                     alert('Please fill in all required fields.'); 
                 }

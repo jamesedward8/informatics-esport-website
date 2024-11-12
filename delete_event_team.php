@@ -1,29 +1,30 @@
 <?php 
-    $mysqli = new mysqli("localhost", "root", "", "esport");
-
-    if ($mysqli->connect_errno) {
-        echo "Failed to connect to MySQL: " . $mysqli->connect_error;
-        exit();
-    }
+    require_once("eventClass.php");
 
     if (isset($_GET['idevent']) && $_GET['idteam']) {
         if ($_GET['idevent'] != null && $_GET['idteam'] != null) {
             $idevent = $_GET['idevent'];
             $idteam = $_GET['idteam'];
+            $eventTeams = new Event();
 
-            $stmt = $mysqli->prepare("DELETE FROM event_teams WHERE idevent = ? AND idteam = ?");
-            $stmt->bind_param("ii", $idevent, $idteam);
-            $stmt->execute();
-
-            $affected = $stmt->affected_rows;
-
-            echo "<script>
-                    alert('Data deleted successfully!');
-                    window.location.href='join_event.php?idevent=$idevent';
-                 </script>";
-
-            $stmt->close();
-        }
+            if ($eventTeams->deleteEventTeams($idevent, $idteam) > 0) {
+                echo "<script>
+                        alert('Data deleted successfully!');
+                        window.location.href='join_event.php?idevent=$idevent&result=deleted';
+                      </script>";
+            } 
+            else {
+                echo "<script>
+                        alert('Error: Event teams could not be deleted.');
+                        window.location.href='join_event.php';
+                      </script>";
+            }
+        } 
     }
-    $mysqli->close();
+    else {
+        echo "<script>
+                alert('Invalid Event Teams ID.');
+                window.location.href='join_event.php';
+                </script>";
+    }
 ?>

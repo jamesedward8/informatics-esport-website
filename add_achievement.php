@@ -1,11 +1,7 @@
 <?php 
     session_start();
-    $mysqli = new mysqli("localhost", "root", "", "esport");
-
-    if ($mysqli->connect_errno) {
-        echo "Failed to connect to MySQL: " . $mysqli->connect_error;
-        exit();
-    }
+    require_once('gameClass.php');
+    require_once('teamClass.php');
 ?>
 
 <!DOCTYPE html>
@@ -39,14 +35,13 @@
                         <div class="mb-3">
                             <label for="idgame" class="form-label, label-add-event">Game Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
                             <?php  
-                                $stmt = $mysqli->prepare("SELECT * from game");
-                                $stmt->execute();
-                                $res = $stmt->get_result();
+                                $game = new Game();
+                                $resGame = $game->getGame();
                             ?>
                             <select name="idgame" id="idgame" required>
                                 <option value="" disabled selected>Pilih Game</option>
                                 <?php
-                                    while($row = $res->fetch_assoc()) {
+                                    while($row = $resGame->fetch_assoc()) {
                                         echo "<option value=".$row['idgame'].">"
                                             .$row['name']."</option>";
                                     }
@@ -60,11 +55,10 @@
                             <select name="idteam" id="idteam" required>
                                 <option value="" disabled selected>Pilih Team</option>
                                 <?php  
-                                    $stmt = $mysqli->prepare("SELECT * FROM team");
-                                    $stmt->execute();
-                                    $res = $stmt->get_result();
+                                    $team = new Team();
+                                    $resTeam = $team->getAllTeams();
 
-                                    while($team = $res->fetch_assoc()) {
+                                    while($team = $resTeam->fetch_assoc()) {
                                         echo "<option value='".$team['idteam']."' data-game='".$team['idgame']."'>".$team['name']."</option>";
                                     }
                                 ?>
@@ -81,7 +75,7 @@
                         <div class="mb-3">
                             <label for="desc" class="form-label, label-add-event">Description:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
                             <br>
-                            <textarea class="form-control, ta-add-event" name="desc" id="desc" rows="5" placeholder="Enter event description here..." required></textarea>
+                            <textarea class="form-control, ta-add-event" name="description" id="desc" rows="5" placeholder="Enter event description here..." required></textarea>
                         </div>
                         <br><br>
 
@@ -91,10 +85,6 @@
                     </form>
                 </div>
             </article>
-
-            <?php
-                $mysqli->close();
-            ?>
         </main>
     </body>
     

@@ -1,28 +1,28 @@
 <?php 
-    $mysqli = new mysqli("localhost", "root", "", "esport");
-
-    if ($mysqli->connect_errno) {
-        echo "Failed to connect to MySQL: " . $mysqli->connect_error;
-        exit();
-    }
-
-    $user = "admin";
+    require_once('achievementClass.php');
 
     if (isset($_POST['btnAddEv'])) {
+        $achievement = new Achievement();
+        
         extract($_POST);
+        $data = [
+            'idteam' => $idteam,
+            'name' => $name,
+            'date' => $date,
+            'description' => $description
+        ];
 
-        $stmt = $mysqli->prepare("INSERT INTO achievement (idteam, name, date, description) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("isss", $idteam, $name, $date, $desc);
-        $stmt->execute();
-
-        $affected = $stmt->affected_rows;
-        $stmt->close();
-
-        echo "<script>
-                alert('Data added successfully!');
-                window.location.href='home.php?result=added';
-             </script>";
+        if ($achievement->addAchievement($data) > 0) {
+            echo "<script>
+                    alert('Data added successfully!');
+                    window.location.href='home.php?result=added';
+                  </script>";
+        } 
+        else {
+            echo "<script>
+                    alert('Error: Failed to add achievement data.');
+                    window.location.href='add_achievement.php';
+                  </script>";
+        }
     }
-
-    $mysqli->close();
 ?>

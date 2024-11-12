@@ -1,25 +1,26 @@
-<?php 
-    $mysqli = new mysqli("localhost", "root", "", "esport");
-
-    if ($mysqli->connect_errno) {
-        echo "Failed to connect to MySQL: " . $mysqli->connect_error;
-        exit();
-    }
+<?php
+    require_once('teamClass.php');
 
     if (isset($_POST['btnEditEv'])) {
-        extract($_POST);
+        $team = new Team();
 
-        $stmt = $mysqli->prepare("UPDATE team SET idgame = ?,  name = ? WHERE idteam = ?");
-        $stmt->bind_param("isi", $idgame, $name, $idteam);
-        $stmt->execute();
+        $data = [
+            'idteam' => $_POST['idteam'],
+            'idgame' => $_POST['idgame'],
+            'name' => $_POST['name']
+        ];
 
-        $affected = $stmt->affected_rows;
-        $stmt->close();
-
-        echo "<script>
-                alert('Data updated successfully!');
-                window.location.href='team.php?idteam=$idteam   &result=updated';
-            </script>";
+        if ($team->updateTeam($data) > 0) {
+            echo "<script>
+                    alert('Data updated successfully!');
+                    window.location.href='team.php?idteam={$data['idteam']}&result=updated';
+                </script>";
+        } 
+        else {
+            echo "<script>
+                    alert('Error: Failed to update game data.');
+                    window.location.href='edit_team.php?idteam={$data['idteam']}';
+                </script>";
+        }
     }
-    $mysqli->close();
 ?>

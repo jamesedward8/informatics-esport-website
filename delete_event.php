@@ -1,28 +1,27 @@
 <?php 
-    $mysqli = new mysqli("localhost", "root", "", "esport");
+    require_once("eventClass.php");
 
-    if ($mysqli->connect_errno) {
-        echo "Failed to connect to MySQL: " . $mysqli->connect_error;
-        exit();
-    }
+    if (isset($_GET['idevent']) && !empty($_GET['idevent'])) {
+      $idevent = $_GET['idevent'];
+      $event = new Event();
 
-    if (isset($_GET['idevent'])) {
-        if ($_GET['idevent'] != null) {
-            $idevent = $_GET['idevent'];
-
-            $stmt = $mysqli->prepare("DELETE FROM event WHERE idevent = ?");
-            $stmt->bind_param("i", $idevent);
-            $stmt->execute();
-
-            $affected = $stmt->affected_rows;
-
-            echo "<script>
-                    alert('Data deleted successfully!');
-                    window.location.href='event.php?idevent=$idevent&result=updated';
+      if ($event->deleteEvent($idevent) > 0) {
+          echo "<script>
+                  alert('Data deleted successfully!');
+                  window.location.href='event.php?result=deleted';
                 </script>";
-
-            $stmt->close();
-        }
+      } 
+      else {
+          echo "<script>
+                  alert('Error: Event could not be deleted.');
+                  window.location.href='event.php';
+                </script>";
+      }
+    } 
+    else {
+      echo "<script>
+              alert('Invalid Event ID.');
+              window.location.href='event.php';
+            </script>";
     }
-    $mysqli->close();
 ?>

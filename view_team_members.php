@@ -1,27 +1,21 @@
 <?php
-session_start();
-$mysqli = new mysqli("localhost", "root", "", "esport");
+    session_start();
+    require_once('proposalClass.php');
+    require_once('pagination.php');
 
-if ($mysqli->connect_errno) {
-    echo "Failed to connect to MySQL: " . $mysqli->connect_error;
-    exit();
-}
+    $role = isset($_SESSION['profile']) ? $_SESSION['profile'] : null;
+    $user = isset($_SESSION['username']) ? $_SESSION['username'] : null;
+    $iduser = isset($_SESSION['idmember']) ? $_SESSION['idmember'] : null;
+    $view_team_id = isset($_GET['team-id']) ? $_GET['team-id'] : null;
+    $view_team_name = isset($_GET['team-name']) ? $_GET['team-name'] : null;
 
-$role = isset($_SESSION['profile']) ? $_SESSION['profile'] : null;
-$user = isset($_SESSION['username']) ? $_SESSION['username'] : null;
-$iduser = isset($_SESSION['idmember']) ? $_SESSION['idmember'] : null;
+    $limit = 3;
+    $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+    $offset = ($page - 1) * $limit;
 
-$view_team_id = isset($_GET['team-id']) ? $_GET['team-id'] : null;
-$view_team_name = isset($_GET['team-name']) ? $_GET['team-name'] : null;
-
-$limit = 3;
-$page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
-$offset = ($page - 1) * $limit;
-
-$resultTotal = $mysqli->query("SELECT COUNT(*) AS total FROM team_members WHERE idmember = $iduser");
-$rowTotal = $resultTotal->fetch_assoc();
-$totalData = $rowTotal['total'];
-$totalPages = ceil($totalData / $limit);
+    $pageTeamMembers = new Proposal();
+    $totalData = $pageTeamMembers->getTotalTeamMembers($iduser);
+    $totalPages = ceil($totalData / $limit);
 ?>
 
 <!DOCTYPE html>
@@ -48,15 +42,8 @@ $totalPages = ceil($totalData / $limit);
             </div>
             <div class="content-page">
                 <?php
-                $stmt_team_members = $mysqli->prepare("SELECT m.username, tm.description 
-                        FROM team_members tm 
-                        JOIN member m ON tm.idmember = m.idmember 
-                        JOIN team t ON tm.idteam = t.idteam 
-                        WHERE t.idteam = ?");
-
-                $stmt_team_members->bind_param("s", $view_team_id);
-                $stmt_team_members->execute();
-                $result_team_members = $stmt_team_members->get_result();
+                $team = new Proposal();
+                $teamMembers = $team->viewTeamMembers($view_team_id);
 
                 echo "<br><br>";
                 echo "<table class='tableEvent'>";
@@ -68,7 +55,7 @@ $totalPages = ceil($totalData / $limit);
                 echo "</thead>";
                 echo "<tbody>";
 
-                while ($row_team_members = $result_team_members->fetch_assoc()) {
+                while ($row_team_members = $teamMembers->fetch_assoc()) {
                     echo "<tr>";
                     echo "<td>" . $row_team_members['username'] . "</td>";
                     echo "<td>" . $row_team_members['description'] . "</td>";
@@ -81,15 +68,7 @@ $totalPages = ceil($totalData / $limit);
             </div>
             <div class="pagination">
                 <?php
-                if ($page > 1) {
-                    echo "<a href='?page=1' class='page-btn'>First</a>";
-                }
-                for ($i = 1; $i <= $totalPages; $i++) {
-                    echo "<a href='?page=$i' class='page-btn " . (($i == $page) ? 'active' : '') . "'>$i</a>";
-                }
-                if ($page < $totalPages) {
-                    echo "<a href='?page=$totalPages' class='page-btn'>Last</a>";
-                }
+                    echo Pagination::createPaginationLinks($page, $totalPages);
                 ?>
             </div>
         </article>

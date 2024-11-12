@@ -1,28 +1,27 @@
-<?php 
-    $mysqli = new mysqli("localhost", "root", "", "esport");
+<?php
+  require_once("gameClass.php");
 
-    if ($mysqli->connect_errno) {
-        echo "Failed to connect to MySQL: " . $mysqli->connect_error;
-        exit();
-    }
+  if (isset($_GET['idgame']) && !empty($_GET['idgame'])) {
+      $idgame = $_GET['idgame'];
+      $game = new Game();
 
-    if (isset($_GET['idgame'])) {
-        if ($_GET['idgame'] != null) {
-            $idgame = $_GET['idgame'];
-
-            $stmt = $mysqli->prepare("DELETE FROM game WHERE idgame = ?");
-            $stmt->bind_param("i", $idgame);
-            $stmt->execute();
-
-            $affected = $stmt->affected_rows;
-
-            echo "<script>
-                    alert('Data deleted successfully!');
-                    window.location.href='game.php?idevent=$idgame&result=updated';
-                </script>";
-
-            $stmt->close();
-        }
-    }
-    $mysqli->close();
+      if ($game->deleteGame($idgame) > 0) {
+        echo "<script>
+                alert('Data deleted successfully!');
+                window.location.href='game.php?result=deleted';
+              </script>";
+      } 
+      else {
+        echo "<script>
+                alert('Error: Game could not be deleted.');
+                window.location.href='game.php';
+              </script>";
+      }
+  } 
+  else {
+    echo "<script>
+            alert('Invalid Game ID.');
+            window.location.href='game.php';
+          </script>";
+  }
 ?>

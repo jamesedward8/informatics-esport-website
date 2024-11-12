@@ -1,10 +1,15 @@
 <?php 
-    $mysqli = new mysqli("localhost", "root", "", "esport");
+    session_start();
+    require_once("achievementClass.php");
+    require_once("teamClass.php");
+    require_once("gameClass.php");
 
-    if ($mysqli->connect_errno) {
-        echo "Failed to connect to MySQL: " . $mysqli->connect_error;
-        exit();
-    } 
+    $achievement = null;
+    if (isset($_GET['idachievement']) && $_GET['idachievement'] != null) {
+        $idachievement = $_GET['idachievement'];
+        $achieveInstance = new Achievement();
+        $achievement = $achieveInstance->getAchievementbyId($idachievement); 
+    }
 ?>
 
 <!DOCTYPE html>
@@ -29,24 +34,6 @@
                     <h1 class="h1-content-title">Edit Achievement</h1>
                 </div>
                 <div class="content-page">     
-                    <?php
-                        if (isset($_GET['idachievement']) && $_GET['idachievement'] != null) {
-                            $idachievement = $_GET['idachievement'];
-                            
-                            $stmt = $mysqli->prepare("SELECT achievement.*, team.idgame FROM achievement 
-                                                    JOIN team ON achievement.idteam = team.idteam 
-                                                    WHERE achievement.idachievement = ?");
-                            $stmt->bind_param("i", $idachievement);
-                            $stmt->execute();
-                            $res = $stmt->get_result();
-                            $achievement = $res->fetch_assoc();
-
-                            if (!$achievement) {
-                                echo "<h1 style='color:red;'>Achievement does not exist.</h1>";
-                            }
-                        }
-                    ?>
-
                     <?php if ($achievement): ?>
                         <form action="edit_achievement_proses.php" method="POST">
                             <input type="hidden" name="idachievement" value="<?php echo $achievement['idachievement'] ?>">
@@ -62,11 +49,10 @@
                                 <select name="idgame" id="idgame" required>
                                     <option value="" disabled>Pilih Game</option>
                                     <?php  
-                                        $stmt = $mysqli->prepare("SELECT * from game");
-                                        $stmt->execute();
-                                        $res = $stmt->get_result();
+                                        $game = new Game();
+                                        $resGame = $game->getGame();
 
-                                        while($row = $res->fetch_assoc()) {
+                                        while($row = $resGame->fetch_assoc()) {
                                             $selected = ($row['idgame'] == $achievement['idgame']) ? 'selected' : '';
                                             echo "<option value='".$row['idgame']."' $selected>".$row['name']."</option>";
                                         }
@@ -80,13 +66,12 @@
                                 <select name="idteam" id="idteam" required>
                                     <option value="" disabled>Pilih Team</option>
                                     <?php  
-                                        $stmt = $mysqli->prepare("SELECT * FROM team");
-                                        $stmt->execute();
-                                        $res = $stmt->get_result();
+                                        $team = new Team();
+                                        $resTeam = $team->getAllTeams();
 
-                                        while($team = $res->fetch_assoc()) {
-                                            $selected = ($team['idteam'] == $achievement['idteam']) ? 'selected' : '';
-                                            echo "<option value='".$team['idteam']."' data-game='".$team['idgame']."' $selected>".$team['name']."</option>";
+                                        while($row1 = $resTeam->fetch_assoc()) {
+                                            $selected = ($row1['idteam'] == $achievement['idteam']) ? 'selected' : '';
+                                            echo "<option value='".$row1['idteam']."' data-game='".$row1['idgame']."' $selected>".$row1['name']."</option>";
                                         }
                                     ?>
                                 </select>
@@ -109,13 +94,11 @@
                                 <input type="submit" class="btn-add-event" value="Save Changes" name="btnEditEv" id="confirmation">
                             </div>      
                         </form>
+                        <?php else: ?>
+                            <h1 style="color:red;">Achievement does not exist.</h1>
                     <?php endif;?>
                 </div>
             </article>
-
-            <?php
-                $mysqli->close();
-            ?>
         </main>
     </body>
     

@@ -1,26 +1,26 @@
-<?php 
-    $mysqli = new mysqli("localhost", "root", "", "esport");
-
-    if ($mysqli->connect_errno) {
-        echo "Failed to connect to MySQL: " . $mysqli->connect_error;
-        exit();
-    }
+<?php
+    require_once("gameClass.php");
 
     if (isset($_POST['btnAddEv'])) {
+        $game = new Game();
+
         extract($_POST);
+        $data = [
+            'name' => $name,
+            'description' => $desc
+        ];
 
-        $stmt = $mysqli->prepare("INSERT INTO game (name, description) VALUES (?, ?)");
-        $stmt->bind_param("ss", $name, $desc);
-        $stmt->execute();
-
-        $affected = $stmt->affected_rows;
-        $stmt->close();
-
-        echo "<script>
-                alert('Data added successfully!');
-                window.location.href='game.php?result=added';
-            </script>";
+        if ($game->addGame($data) > 0) {
+            echo "<script>
+                    alert('Data added successfully!');
+                    window.location.href='game.php?result=added';
+                </script>";
+        } 
+        else {
+            echo "<script>
+                    alert('Error: Failed to add game data.');
+                    window.location.href='add_game.php';
+                </script>";
+        }
     }
-
-    $mysqli->close();
 ?>

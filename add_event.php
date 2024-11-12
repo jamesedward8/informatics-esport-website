@@ -1,13 +1,5 @@
 <?php 
     session_start();
-    $mysqli = new mysqli("localhost", "root", "", "esport");
-
-    if ($mysqli->connect_errno) {
-        echo "Failed to connect to MySQL: " . $mysqli->connect_error;
-        exit();
-    }
-
-    $user = "admin";
 ?>
 
 <!DOCTYPE html>
@@ -57,10 +49,6 @@
                     </form>
                 </div>
             </article>
-
-            <?php
-                $mysqli->close();
-            ?>
         </main>
     </body>
 

@@ -1,5 +1,7 @@
 <?php 
     session_start();
+    require_once('proposalClass.php');
+    require_once("Pagination.php");
 
     $mysqli = new mysqli("localhost", "root", "", "esport");
 
@@ -17,10 +19,10 @@
     $page = isset($_GET['page']) ? (int)$_GET['page'] : 1; 
     $offset = ($page - 1) * $limit; 
 
-    $resultTotal = $mysqli->query("SELECT COUNT(*) AS total FROM join_proposal");
-    $rowTotal = $resultTotal->fetch_assoc();
-    $totalData = $rowTotal['total'];
+    $joinProposal = new Proposal();
+    $totalData = $joinProposal->getTotalProposals($idmember);
     $totalPages = ceil($totalData / $limit);
+    $proposals = $joinProposal->getProposalsByMember($idmember, $offset, $limit);
 ?>
 
 <!DOCTYPE html>
@@ -59,36 +61,21 @@
                         echo "<tbody>";
 
                         if ($role == "member") { 
-                            $stmt = $mysqli->prepare("SELECT t.idteam, g.name, t.name, m.username, jp.description, jp.status FROM join_proposal jp INNER JOIN team t ON jp.idteam = t.idteam INNER JOIN game g ON t.idgame=g.idgame INNER JOIN member m ON jp.idmember = m.idmember WHERE jp.idmember = ?");
-                            $stmt->bind_param('i', $idmember);
-                        }
-                        
-                        $stmt->execute();
-                        $result = $stmt->get_result();
-
-                        while ($row = $result->fetch_assoc()) {
-                            $idteam = $row['idteam'];
-                            $team = $mysqli->query("SELECT * FROM team WHERE idteam = '$idteam'")->fetch_assoc();
-                            $game = $mysqli->query("SELECT * FROM game WHERE idgame = '$team[idgame]'")->fetch_assoc();
-                            echo "<tr>";
-                                if ($role == "member") {
-                                    // Display only team name, game, role, and status for the member
-                                    echo "<td>" . $team['name'] . "</td>";
-                                    echo "<td>" . $game['name'] . "</td>";
-                                    echo "<td>" . $row['description'] . "</td>";
+                            while ($row = $proposals->fetch_assoc()) {
+                                echo "<tr>";
+                                    echo "<td>" . htmlspecialchars($row['team_name']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['game_name']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['description']) . "</td>";
                                     
-                                    // Status with color coding
-                                    if ($row['status'] == "waiting") {
-                                        echo "<td style='color: lightblue; font-weight: bold;'>". $row['status'] ."</td>";
-                                    } 
-                                    else if ($row['status'] == "approved") {
-                                        echo "<td style='color: green; font-weight: bold;'>". $row['status'] ."</td>";
-                                    } 
-                                    else if ($row['status'] == "rejected") {
-                                        echo "<td style='color: red; font-weight: bold;'>". $row['status'] ."</td>";
-                                    }
-                                }
-                            echo "</tr>";
+                                    $statusColor = match($row['status']) {
+                                        "waiting" => "lightblue",
+                                        "approved" => "green",
+                                        "rejected" => "red",
+                                        default => "black"
+                                    };
+                                    echo "<td style='color: $statusColor; font-weight: bold;'>" . htmlspecialchars($row['status']) . "</td>";
+                                echo "</tr>";
+                            }
                         }
                         echo "</tbody>";
                         echo "</table>";
@@ -96,9 +83,7 @@
                 </div>
                 <div class="pagination">
                     <?php
-                        for ($i = 1; $i <= $totalPages; $i++) {
-                            echo "<a href='?page=$i' class='page-btn " . (($i == $page) ? 'active' : '') . "'>$i</a>";
-                        }
+                        echo Pagination::createPaginationLinks($page, $totalPages);
                     ?>
                 </div>
             </article>

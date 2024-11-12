@@ -1,23 +1,18 @@
 <?php
-session_start();
-$mysqli = new mysqli("localhost", "root", "", "esport");
+    session_start();
+    require_once("eventClass.php");
+    require_once('pagination.php');
 
-if ($mysqli->connect_errno) {
-    echo "Failed to connect to MySQL: " . $mysqli->connect_error;
-    exit();
-}
+    $role = isset($_SESSION['profile']) ? $_SESSION['profile'] : null;
+    $user = isset($_SESSION['username']) ? $_SESSION['username'] : null; 
 
-$role = isset($_SESSION['profile']) ? $_SESSION['profile'] : null;
-$user = isset($_SESSION['username']) ? $_SESSION['username'] : null; 
+    $limit = 3;
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $offset = ($page - 1) * $limit;
 
-$limit = 3;
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$offset = ($page - 1) * $limit;
-
-$resultTotal = $mysqli->query("SELECT COUNT(*) AS total FROM event");
-$rowTotal = $resultTotal->fetch_assoc();
-$totalData = $rowTotal['total'];
-$totalPages = ceil($totalData / $limit);
+    $pageEvent = new Event();
+    $totalData = $pageEvent->getTotalEvent();
+    $totalPages = ceil($totalData / $limit);
 ?>
 
 <!DOCTYPE html>
@@ -52,10 +47,8 @@ $totalPages = ceil($totalData / $limit);
                 </div>
                 <div class="content-page">
                     <?php
-                        $stmt = $mysqli->prepare("SELECT * FROM event LIMIT ? OFFSET ?");
-                        $stmt->bind_param('ii', $limit, $offset);
-                        $stmt->execute();
-                        $res = $stmt->get_result();
+                        $event = new Event();
+                        $resEvent = $event->getEvent($offset, $limit);
 
                         echo "<br><br>";
                         echo "<table class='tableEvent'>";
@@ -77,13 +70,13 @@ $totalPages = ceil($totalData / $limit);
                         echo "</thead>";
                         echo "<tbody>";
 
-                        if ($res->num_rows == 0) {
+                        if ($resEvent->num_rows == 0) {
                             echo "<tr>
                                     <td colspan='4'>No Event Available, Stay Tuned!</td>
                                 </tr>";
                         } 
                         else {
-                            while ($row = $res->fetch_assoc()) {
+                            while ($row = $resEvent->fetch_assoc()) {
                                 $date = new DateTime($row['date']);
                                 $formatDate = $date->format('d F Y');
 
@@ -111,15 +104,7 @@ $totalPages = ceil($totalData / $limit);
                 </div>
                 <div class="pagination">
                     <?php
-                        if ($page > 1) {
-                            echo "<a href='?page=1' class='page-btn'>First</a>";
-                        }
-                        for ($i = 1; $i <= $totalPages; $i++) {
-                            echo "<a href='?page=$i' class='page-btn " . (($i == $page) ? 'active' : '') . "'>$i</a>";
-                        }
-                        if ($page < $totalPages) {
-                            echo "<a href='?page=$totalPages' class='page-btn'>Last</a>";
-                        }
+                        echo Pagination::createPaginationLinks($page, $totalPages);
                     ?>
                 </div>
             </article>

@@ -1,28 +1,26 @@
 <?php 
-    $mysqli = new mysqli("localhost", "root", "", "esport");
+  require_once("achievementClass.php");
+  if (isset($_GET['idachievement']) && !empty($_GET['idachievement'])) {
+      $idachievement = $_GET['idachievement'];
+      $achievement = new Achievement();
 
-    if ($mysqli->connect_errno) {
-        echo "Failed to connect to MySQL: " . $mysqli->connect_error;
-        exit();
-    }
-    
-    if (isset($_GET['idachievement'])) {
-        if ($_GET['idachievement'] != null) {
-            $idachievement = $_GET['idachievement'];
-
-            $stmt = $mysqli->prepare("DELETE FROM achievement WHERE idachievement = ?");
-            $stmt->bind_param("i", $idachievement);
-            $stmt->execute();
-
-            $affected = $stmt->affected_rows;
-
-            echo "<script>
-                    alert('Data deleted successfully!');
-                    window.location.href='home.php?idachievement=$idachievement&result=updated';
-                </script>";
-
-            $stmt->close();
-        }
-    }
-    $mysqli->close();
+      if ($achievement->deleteAchievement($idachievement) > 0) {
+        echo "<script>
+                alert('Data deleted successfully!');
+                window.location.href='home.php?result=deleted';
+              </script>";
+      } 
+      else {
+        echo "<script>
+                alert('Error: Achievement could not be deleted.');
+                window.location.href='home.php';
+              </script>";
+      }
+  } 
+  else {
+      echo "<script>
+              alert('Invalid Achievement ID.');
+              window.location.href='home.php';
+            </script>";
+  }
 ?>

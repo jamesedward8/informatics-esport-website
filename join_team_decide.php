@@ -1,12 +1,7 @@
 <?php 
     session_start();
-
-    $mysqli = new mysqli("localhost", "root", "", "esport");
-
-    if ($mysqli->connect_errno) {
-        echo "Failed to connect to MySQL: " . $mysqli->connect_error;
-        exit();
-    }
+    require_once('proposalClass.php');
+    require_once('pagination.php');
 
     $role = isset($_SESSION['profile']) ? $_SESSION['profile'] : null;
     $idmember = isset($_SESSION['idmember']) ? $_SESSION['idmember'] : null;
@@ -15,9 +10,8 @@
     $page = isset($_GET['page']) ? (int)$_GET['page'] : 1; 
     $offset = ($page - 1) * $limit; 
 
-    $resultTotal = $mysqli->query("SELECT COUNT(*) AS total FROM join_proposal");
-    $rowTotal = $resultTotal->fetch_assoc();
-    $totalData = $rowTotal['total'];
+    $pageEvent = new Proposal();
+    $totalData = $pageEvent->getTotalProposal();
     $totalPages = ceil($totalData / $limit);
 ?>
 
@@ -58,22 +52,15 @@
                         echo "<tbody>";
 
                         if ($role == "admin") {
-                            $stmt = $mysqli->prepare("SELECT t.idteam, t.name as team_name, g.name as game_name, m.username, jp.description, jp.status, jp.idmember
-                            FROM join_proposal jp 
-                            INNER JOIN team t ON jp.idteam = t.idteam 
-                            INNER JOIN game g ON t.idgame = g.idgame 
-                            INNER JOIN member m ON jp.idmember = m.idmember
-                            LIMIT ? OFFSET ?");
-                            $stmt->bind_param('ii', $limit, $offset);
-                            $stmt->execute();
-                            $result = $stmt->get_result();
+                            $proposal = new Proposal();
+                            $resProposal = $proposal->getProposal($offset, $limit);
                         } 
 
-                        if ($result->num_rows == 0) {
+                        if ($resProposal->num_rows == 0) {
                             echo "<tr><td colspan='5'>No join proposal found.</td></tr>";
                         } 
                         else {
-                            while ($row = $result->fetch_assoc()) {
+                            while ($row = $resProposal->fetch_assoc()) {
                                 echo "<tr>";
                                 if ($role == "admin") {
                                     echo "<td>" . $row['username'] . "</td>";
@@ -106,15 +93,7 @@
                 </div>
                 <div class="pagination">
                         <?php
-                        if ($page > 1) {
-                            echo "<a href='?page=1' class='page-btn'>First</a>";
-                        }
-                        for ($i = 1; $i <= $totalPages; $i++) {
-                            echo "<a href='?page=$i' class='page-btn " . (($i == $page) ? 'active' : '') . "'>$i</a>";
-                        }
-                        if ($page < $totalPages) {
-                            echo "<a href='?page=$totalPages' class='page-btn'>Last</a>";
-                        }
+                            echo Pagination::createPaginationLinks($page, $totalPages);
                         ?>
                     </div>
             </article>

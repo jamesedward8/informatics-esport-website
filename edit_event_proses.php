@@ -1,25 +1,27 @@
 <?php 
-    $mysqli = new mysqli("localhost", "root", "", "esport");
-
-    if ($mysqli->connect_errno) {
-        echo "Failed to connect to MySQL: " . $mysqli->connect_error;
-        exit();
-    }
+    require_once("eventClass.php");
 
     if (isset($_POST['btnEditEv'])) {
-        extract($_POST);
+        $event = new Event();
 
-        $stmt = $mysqli->prepare("UPDATE event SET name = ?, date = ?, description = ? WHERE idevent = ?");
-        $stmt->bind_param("sssi", $name, $date, $desc, $idevent);
-        $stmt->execute();
+        $data = [
+            'name' => $_POST['name'],
+            'date' => $_POST['date'],
+            'desc' => $_POST['desc'],   
+            'idevent' => $_POST['idevent']
+        ];
 
-        $affected = $stmt->affected_rows;
-        $stmt->close();
-
-        echo "<script>
-                alert('Data updated successfully!');
-                window.location.href='event.php?idevent=$idevent&result=updated';
-            </script>";
+        if ($event->updateEvent($data) > 0) {
+            echo "<script>
+                    alert('Data updated successfully!');
+                    window.location.href='event.php?idevent={$data['idevent']}&result=updated';
+                </script>";
+        } 
+        else {
+            echo "<script>
+                    alert('Error: Failed to update event data.');
+                    window.location.href='edit_event.php?idevent={$data['idevent']}';
+                </script>";
+        }
     }
-    $mysqli->close();
 ?>

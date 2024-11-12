@@ -1,25 +1,28 @@
 <?php 
-    $mysqli = new mysqli("localhost", "root", "", "esport");
-
-    if ($mysqli->connect_errno) {
-        echo "Failed to connect to MySQL: " . $mysqli->connect_error;
-        exit();
-    }
+    require_once("achievementClass.php");
 
     if (isset($_POST['btnEditEv'])) {
-        extract($_POST);
+        $achievement = new Achievement();
 
-        $stmt = $mysqli->prepare("UPDATE achievement SET idteam = ?,  name = ?, date = ?, description = ? WHERE idachievement = ?");
-        $stmt->bind_param("isssi", $idteam, $name, $date, $desc, $idachievement);
-        $stmt->execute();
+        $data = [
+            'idteam' => $_POST['idteam'],
+            'name' => $_POST['name'],
+            'date' => $_POST['date'],   
+            'desc' => $_POST['desc'],
+            'idachievement' => $_POST['idachievement']
+        ];
 
-        $affected = $stmt->affected_rows;
-        $stmt->close();
-
-        echo "<script>
-                alert('Data updated successfully!');
-                window.location.href='home.php?idachievement=$idachievement   &result=updated';
-            </script>";
+        if ($achievement->updateAchievements($data) > 0) {
+            echo "<script>
+                    alert('Data updated successfully!');
+                    window.location.href='home.php?idevent={$data['idachievement']}&result=updated';
+                </script>";
+        } 
+        else {
+            echo "<script>
+                    alert('Error: Failed to update achievement data.');
+                    window.location.href='edit_achievement.php?idachievement={$data['idachievement']}';
+                </script>";
+        }
     }
-    $mysqli->close();
 ?>

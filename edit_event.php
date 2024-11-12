@@ -1,10 +1,13 @@
 <?php 
     session_start();
-    $mysqli = new mysqli ("localhost", "root", "", "esport");
+    require_once("eventClass.php");
 
-    if ($mysqli->connect_errno) {
-        echo "Failed to connect to MySQL: " . $mysqli->connect_error;
-        exit();
+    $event = null;
+    if (isset($_GET['idevent']) && $_GET['idevent'] != null) {
+        $idevent = $_GET['idevent'];
+        
+        $eventInstance = new Event();
+        $event = $eventInstance->getEventbyId($idevent); 
     }
 ?>
 
@@ -29,23 +32,6 @@
                     <h1 class="h1-content-title">Edit Event</h1>
                 </div>
                 <div class="content-submenu-page">     
-                    <?php
-                        if (isset($_GET['idevent'])) {
-                            if ($_GET['idevent'] != null) {
-                                $idevent = $_GET['idevent'];
-                                $stmt = $mysqli->prepare("SELECT * FROM event WHERE idevent = ?");
-                                $stmt->bind_param("i", $idevent);
-                                $stmt->execute();
-                                $res = $stmt->get_result();
-                                $event = $res->fetch_assoc();
-
-                                if (!$event) {
-                                    echo "<h1 style='color:red;'>Event does not exist.</h1>";
-                                }
-                            }
-                        }
-                    ?>
-
                     <?php if ($event): ?>
                         <form action="edit_event_proses.php" method="POST">
                             <input type="hidden" name="idevent" value="<?php echo $event['idevent'] ?>">
@@ -72,12 +58,11 @@
                                 <input type="submit" class="btn-edit-event" value="Save Changes" name="btnEditEv">
                             </div>      
                         </form>
+                        <?php else: ?>
+                            <h1 style="color:red;">Event does not exist.</h1>
                     <?php endif;?>
                 </div>
             </article>
-            <?php
-                $mysqli->close();
-            ?>
         </main>
     </body>
 

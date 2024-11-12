@@ -1,22 +1,14 @@
 <?php
     session_start();
-    $mysqli = new mysqli("localhost", "root", "", "esport");
-
-    if ($mysqli->connect_errno) {
-        echo "Failed to connect to MySQL: " . $mysqli->connect_error;
-        exit();
-    }
+    require_once('teamClass.php');
 
     $role = isset($_SESSION['role']) ? $_SESSION['role'] : null;
     $user = isset($_SESSION['username']) ? $_SESSION['username'] : null;
     $idteam = isset($_GET['idteam']) ? $_GET['idteam'] : null;
 
-    $stmt_team_name = $mysqli->prepare("SELECT name FROM team WHERE idteam = ?");
-    $stmt_team_name->bind_param("i", $idteam);
-    $stmt_team_name->execute();
-    $res_team_name = $stmt_team_name->get_result();
-    $team_name = $res_team_name->fetch_assoc()['name'];
-
+    $team = new Team();
+    $team_name = $team->getTeamById($idteam)['name'];
+    
     $profile_picture = "uploads/" . $idteam . ".jpg";
     if (!file_exists($profile_picture)) {
         $profile_picture = "img/default_pp.jpg";

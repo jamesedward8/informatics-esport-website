@@ -1,25 +1,26 @@
 <?php 
-    $mysqli = new mysqli("localhost", "root", "", "esport");
-
-    if ($mysqli->connect_errno) {
-        echo "Failed to connect to MySQL: " . $mysqli->connect_error;
-        exit();
-    }
+    require_once("gameClass.php");
 
     if (isset($_POST['btnEditEv'])) {
-        extract($_POST);
+        $game = new Game();
 
-        $stmt = $mysqli->prepare("UPDATE game SET name = ?,  description = ? WHERE idgame = ?");
-        $stmt->bind_param("ssi", $name, $desc, $idgame);
-        $stmt->execute();
+        $data = [
+            'id' => $_POST['idgame'],
+            'name' => $_POST['name'],
+            'description' => $_POST['desc']
+        ];
 
-        $affected = $stmt->affected_rows;
-        $stmt->close();
-
-        echo "<script>
-                alert('Data updated successfully!');
-                window.location.href='game.php?idgame=$idgame&result=updated';
-            </script>";
+        if ($game->updateGame($data) > 0) {
+            echo "<script>
+                    alert('Data updated successfully!');
+                    window.location.href='game.php?idgame={$data['id']}&result=updated';
+                </script>";
+        } 
+        else {
+            echo "<script>
+                    alert('Error: Failed to update game data.');
+                    window.location.href='edit_game.php?idgame={$data['id']}';
+                </script>";
+        }
     }
-    $mysqli->close();
 ?>
