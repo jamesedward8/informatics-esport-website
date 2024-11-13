@@ -21,6 +21,39 @@ class Event extends DBParent
         return $res;
     }
 
+    public function getEventForJoinedTeam($idmember) {
+        $sql = "SELECT DISTINCT e.idevent, e.name, e.date, e.description 
+                FROM event e 
+                JOIN event_teams et ON e.idevent = et.idevent 
+                JOIN team_members tm ON tm.idteam = et.idteam 
+                WHERE tm.idmember = ?";
+                
+        $stmt = $this->mysqli->prepare($sql);
+        $stmt->bind_param("i", $idmember);
+        $stmt->execute();
+        $result = $stmt->get_result();
+    
+        // Fetch all matching events
+        $events = [];
+        while ($row = $result->fetch_assoc()) {
+            $events[] = $row;
+        }
+        
+        $stmt->close();
+        return $events;
+    }
+
+    /*
+    public function getEventForJoinedTeam($idmember, $idevent, $idteam) {
+        $sql = "SELECT e.name, e.date, e.description FROM event e JOIN event_teams et ON e.idevent = et.idevent JOIN team t ON t.idteam = et.idteam JOIN team_members tm ON t.idteam = tm.idteam JOIN member m ON m.idmember = tm.idmember WHERE tm.idmember = ? AND et.idevent = ? AND et.idteam = ?;";
+        $stmt = $this->mysqli->prepare($sql);
+        $stmt->bind_param("iii", $idmember, $idevent, $idteam);
+        $affected_rows = $stmt->affected_rows;
+        $stmt->close();
+        return $affected_rows;
+    }
+    */
+
     public function addEvent($arr_col){
         $sql = "INSERT INTO event (name, date, description) VALUES (?, ?, ?)";
         $stmt = $this->mysqli->prepare($sql);
@@ -49,6 +82,22 @@ class Event extends DBParent
         $event = $result->fetch_assoc();
         $stmt->close();
         return $event;
+    }
+
+    public function getTeamIdsForEvent($idevent) {
+        $sql = "SELECT idteam FROM event_teams WHERE idevent = ?";
+
+        $stmt = $this->mysqli->prepare($sql);
+        $stmt->bind_param('i', $idevent);
+        $stmt->execute();
+        $res = $stmt->get_result();
+
+        $teamIds = [];
+        while ($row = $res->fetch_assoc()) {
+            $teamIds[] = $row['idteam'];
+        }
+
+        return $teamIds;
     }
 
     public function deleteEvent($idevent){
