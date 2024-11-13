@@ -2,6 +2,15 @@
     session_start();
     require_once("teamClass.php");
     require_once('pagination.php');
+    require_once('proposalClass.php');
+
+    $mysqli = new mysqli("localhost", "root", "", "esport");
+
+
+    if ($mysqli->connect_errno) {
+        echo json_encode(['status' => 'error', 'message' => 'Database connection failed.']);
+        exit();
+    }
 
     $role = isset($_SESSION['profile']) ? $_SESSION['profile'] : null;
     $user = isset($_SESSION['username']) ? $_SESSION['username'] : null;
@@ -14,6 +23,8 @@
     $pageAchieve = new Team();
     $totalData = $pageAchieve->getTotalTeam();
     $totalPages = ceil($totalData / $limit);
+
+    $prop = new Proposal();
 ?>
 
 <!DOCTYPE html>
@@ -29,8 +40,8 @@
     </head>
 
     <body>
-        <?php
-        include('header.php');
+        <?php  
+            include('header.php');
         ?>
         <main class="content">
             <article>
@@ -42,21 +53,12 @@
                         <?php
                             if ($role == "admin") {
                                 echo "<input type='submit' class='btn-add-ev' value='ADD' name='btnAdd'>";
-                            }
-                            else {
-                                $stmt_view_team = $mysqli->prepare("SELECT tm.idteam, tm.idmember, tm.description, t.name as namateam, g.name as namagame 
-                                                                    FROM team_members tm 
-                                                                    JOIN team t ON tm.idteam = t.idteam 
-                                                                    JOIN game g ON t.idgame = g.idgame 
-                                                                    WHERE tm.idmember = ?");
+                            } else {
+                                $resTeam = $prop->viewTeambyId($iduser);
 
-                                $stmt_view_team->bind_param('i', $iduser);
-                                $stmt_view_team->execute();
-                                $res_view_team = $stmt_view_team->get_result();
-
-                                if ($row_view_team = $res_view_team->fetch_assoc()) {
+                                if ($row_view_team = $resTeam->fetch_assoc()) {
                                     echo "<a class='btn-view-my-team' href='view_my_team.php?idteam=" . $row_view_team['idteam'] . "'>View My Team</a>";
-                                } 
+                                }
                             }
                         ?>
                     </form>
@@ -64,86 +66,73 @@
                 <div class="content-page">
                     <?php
                         $team = new Team();
-                        $resTeam = $team->getTeam($offset,$limit);  
+                        $resTeam = $team->getTeam($offset, $limit);  
 
                         echo "<br><br>";
                         echo "<table class='tableEvent'>";
                         echo "<thead>";
+                        echo "<tr>";
+                        echo "<th>Profile Picture</th>";
+                        echo "<th>Team Name</th>";
+                        echo "<th>Game Name</th>";
+                        
                         if ($role == "admin") {
-                            echo "<tr>
-                                    <th>Team Name</th>
-                                    <th>Game Name</th>
-                                    <th colspan=3>Action</th>
-                                </tr>";
-                        } else if ($role == "member") {
-                            echo "<tr>
-                                    <th>Team Name</th>
-                                    <th>Game Name</th>
-                                    <th>Action</th>
-                                </tr>";
-                        } else if ($role == null) {
-                            echo "<tr>
-                                    <th>Team Name</th>
-                                    <th>Game Name</th>
-                                </tr>";
+                            echo "<th colspan=3>Action</th>";
+                        } 
+                        else if ($role == "member") {
+                            echo "<th>Action</th>";
                         }
+                        
+                        echo "</tr>";
                         echo "</thead>";
                         echo "<tbody>";
 
                         if ($resTeam->num_rows == 0) {
-                            echo "<tr>
-                                    <td colspan='5'>No Team Available, Stay Tuned!</td>
-                                </tr>";
-                        } else {
-                            $stmt_check_game = $mysqli->prepare("SELECT jp.idteam, t.idgame 
-                                                                        FROM join_proposal jp 
-                                                                        JOIN team t ON jp.idteam = t.idteam 
-                                                                        WHERE jp.idmember = ? AND jp.status = 'approved'");
-                            $stmt_check_game->bind_param('i', $iduser);
-                            $stmt_check_game->execute();
-                            $res_game_check = $stmt_check_game->get_result();
+                            echo "<tr><td colspan='5'>No Team Available, Stay Tuned!</td></tr>";
+                        } 
+                        else {
+                            $resApprovedTeam = $prop->getApprovedTeam($iduser);
 
                             $accepted_games = [];
-                            while ($game_row = $res_game_check->fetch_assoc()) {
+                            while ($game_row = $resApprovedTeam->fetch_assoc()) {
                                 $accepted_games[$game_row['idgame']] = $game_row['idteam'];
                             }
 
                             while ($row = $resTeam->fetch_assoc()) {
+                                $profile_picture = "uploads/" . $row['idteam'] . ".jpg";
+                                if (!file_exists($profile_picture)) {
+                                    $profile_picture = "img/default_pp.jpg";
+                                }
+
+                                echo "<tr>";
+                                echo "<td><img src='" . htmlspecialchars($profile_picture) . "' id='profile_pic_" . $row['idteam'] . "' alt='Profile Picture' style='width: 80px;height: 80px; object-fit: cover; border-radius: 50%;'>";
+                                if ($role === 'admin'){
+                                    echo "<form id='upload-form-{$row['idteam']}' enctype='multipart/form-data' method='POST' action='upload_pp.php' class='upload-form'>";
+                                    echo "<label for='profile_picture_{$row['idteam']}'>Change</label>";
+                                    echo "<input type='file' name='profile_picture' id='profile_picture_{$row['idteam']}' accept='.jpg' required>";
+                                    echo "<button type='button' class='save-btn' data-id='{$row['idteam']}'>Save</button>";
+                                    echo "<input type='hidden' name='idteam' value='" . htmlspecialchars($row['idteam']) . "'>";
+                                    echo "<input type='hidden' name='role' value='" . htmlspecialchars($role) . "'>";
+                                    echo "</form>";
+                                }
+                                echo "</td>";
+                                echo "<td>" . htmlspecialchars($row['namateam']) . "</td>";
+                                echo "<td>" . htmlspecialchars($row['namagame']) . "</td>";
+
                                 if ($role == "admin") {
-                                    echo "<tr>
-                                            <td>" . $row['namateam'] . "</td>
-                                            <td>" . $row['namagame'] . "</td>
-                                            <td><a class='td-btn-view-pp' href='view_pp.php?idteam=". $row['idteam'] ."' style='display:" . (($role == "admin") ? "block" : "none") . ";'>View Profile</a></td>
-                                            <td><a class='td-btn-edit' href='edit_team.php?idteam=" . $row['idteam'] . "' style='display:" . (($role == "admin") ? "block" : "none") . ";'>Edit</a></td>
-                                            <td><a class='td-btn-delete' href='delete_team.php?idteam=" . $row['idteam'] . "' style='display:" . (($role == "admin") ? "block" : "none") . ";'>Delete</a></td>
-                                         </tr>";
+                                    echo "<td><a class='td-btn-edit' href='edit_team.php?idteam=" . $row['idteam'] . "'>Edit</a></td>";
+                                    echo "<td><a class='td-btn-delete' href='delete_team.php?idteam=" . $row['idteam'] . "'>Delete</a></td>";
                                 } 
                                 else if ($role == "member") {
-                                    echo "<tr>
-                                            <td>" . $row['namateam'] . "</td>
-                                            <td>" . $row['namagame'] . "</td>";
+                                    $resWaitingTeam = $prop->getWaitedTeam($row['idteam'], $iduser);
 
-                                    $stmt1 = $mysqli->prepare("SELECT jp.idteam, jp.idmember 
-                                                                            FROM join_proposal jp 
-                                                                            WHERE jp.idteam = ? AND jp.status = 'waiting' AND jp.idmember = ?");
-                                    $stmt1->bind_param('ii', $row['idteam'], $iduser);
-                                    $stmt1->execute();
-                                    $res_jp_check = $stmt1->get_result();
+                                    if ($resWaitingTeam->num_rows > 0) {
+                                        echo "<td><a class='td-btn-edit' href='join_team_status.php?idteam=" . $row['idteam'] . "&idmember=" . $iduser . "'>See Status</a></td>";
+                                    } else {
+                                        $resStatus = $prop->getStatusTeam($row['idteam'], $iduser);
 
-                                    if ($res_jp_check->num_rows > 0) {
-                                        echo "<td><a class='td-btn-edit' href='join_team_status.php?idteam=" . $row['idteam'] . "&idmember=" . $iduser . "' style='display:" . (($role == "member") ? "block" : "none") . ";'>See Status</a></td>";
-                                    } 
-                                    else {
-                                        $stmt2 = $mysqli->prepare("SELECT jp.status 
-                                                                                FROM join_proposal jp 
-                                                                                WHERE jp.idteam = ? AND jp.idmember = ?");
-                                        $stmt2->bind_param('ii', $row['idteam'], $iduser);
-                                        $stmt2->execute();
-                                        $res_status_check = $stmt2->get_result();
-
-                                        if ($res_status_check->num_rows > 0) {
-                                            $proposal = $res_status_check->fetch_assoc();
-
+                                        if ($resStatus->num_rows > 0) {
+                                            $proposal = $resStatus->fetch_assoc();
                                             if ($proposal['status'] == 'approved') {
                                                 echo "<td><span style='color: green; font-weight: bold;'>Approved</span></td>";
                                             } 
@@ -155,7 +144,7 @@
                                                     echo "<td><span style='color: red; font-weight: bold;'>Not Eligible to Join</span></td>";
                                                 } 
                                                 else {
-                                                    echo "<td><a class='td-btn-edit' href='join_team.php?idteam=" . $row['idteam'] . "&idmember=" . $iduser . "' style='display:" . (($role == "member") ? "block" : "none") . ";' name='btn-Join'>Join</a></td>";
+                                                    echo "<td><a class='td-btn-edit' href='join_team.php?idteam=" . $row['idteam'] . "&idmember=" . $iduser . "'>Join</a></td>";
                                                 }
                                             }
                                         } else {
@@ -163,18 +152,12 @@
                                                 echo "<td><span style='color: red; font-weight: bold;'>Not Eligible to Join</span></td>";
                                             } 
                                             else {
-                                                echo "<td><a class='td-btn-edit' href='join_team.php?idteam=" . $row['idteam'] . "&idmember=" . $iduser . "' style='display:" . (($role == "member") ? "block" : "none") . ";' name='btn-Join'>Join</a></td>";
+                                                echo "<td><a class='td-btn-edit' href='join_team.php?idteam=" . $row['idteam'] . "&idmember=" . $iduser . "'>Join</a></td>";
                                             }
                                         }
                                     }
-                                    echo "</tr>";
-                                } 
-                                else if ($role == null) {
-                                    echo "<tr>
-                                            <td>" . $row['namateam'] . "</td>
-                                            <td>" . $row['namagame'] . "</td>
-                                         </tr>";
                                 }
+                                echo "</tr>";
                             }
                         }
                         echo "</tbody>";
@@ -182,15 +165,11 @@
                     ?>
                 </div>
                 <div class="pagination">
-                    <?php
-                        echo Pagination::createPaginationLinks($page, $totalPages);
-                    ?>
+                    <?php echo Pagination::createPaginationLinks($page, $totalPages); ?>
                 </div>
             </article>
         </main>
-        <?php
-            include('footer.php');
-        ?>
+        <?php include('footer.php'); ?>
     </body>
     
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -201,6 +180,55 @@
                 
                 if (!confirmation) {
                     e.preventDefault();     
+                }
+            });
+
+            var originalSrc = {};
+
+            $('img[id^="profile_pic_"]').each(function() {
+                var idteam = $(this).attr('id').split('_')[2];
+                originalSrc[idteam] = $(this).attr('src');
+            });
+
+            $('input[type="file"]').change(function(e) {
+                var idteam = $(this).closest('form').find('input[name="idteam"]').val();
+                var reader = new FileReader();
+
+                reader.onload = function(e) {
+                    $('#profile_pic_' + idteam).attr('src', e.target.result);
+                };
+                reader.readAsDataURL(this.files[0]);
+            });
+
+            $('.save-btn').click(function(e) {
+                var idteam = $(this).data('id');
+                var confirmation = confirm("Are you sure you want to change the profile picture?");
+                
+                if (confirmation) {
+                    var form = $('#upload-form-' + idteam);
+                    var formData = new FormData(form[0]);
+
+                    $.ajax({
+                        url: form.attr('action'),
+                        type: 'POST',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: function(response) {
+                            if (response.status === 'success') {
+                                alert(response.message);
+                            } else {
+                                alert(response.message);
+                                $('#profile_pic_' + idteam).attr('src', originalSrc[idteam]);
+                            }
+                        },
+                        error: function() {
+                            alert('There was an error uploading the profile picture.');
+                            $('#profile_pic_' + idteam).attr('src', originalSrc[idteam]);
+                        }
+                    });
+                } else {
+                    $('#profile_pic_' + idteam).attr('src', originalSrc[idteam]);
                 }
             });
         });

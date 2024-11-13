@@ -57,7 +57,7 @@
 
                 while ($row_team_members = $teamMembers->fetch_assoc()) {
                     echo "<tr>";
-                    echo "<td>" . $row_team_members['username'] . "</td>";
+                    echo "<td>" . ($row_team_members['username'] == $_SESSION['username'] ? "<b>" . $row_team_members['username'] . " (saya)" . "</b>" : $row_team_members['username']) . "</td>";
                     echo "<td>" . $row_team_members['description'] . "</td>";
                     echo "</tr>";
                 }

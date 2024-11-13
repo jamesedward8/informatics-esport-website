@@ -91,6 +91,19 @@ class Proposal extends DBParent
         return $result;
     }
 
+    public function viewTeambyId($idmember){
+        $sql = "SELECT tm.idteam, tm.idmember, tm.description, t.name as namateam, g.name as namagame 
+                FROM team_members tm 
+                JOIN team t ON tm.idteam = t.idteam 
+                JOIN game g ON t.idgame = g.idgame 
+                WHERE tm.idmember = ?";
+        $stmt = $this->mysqli->prepare($sql);
+        $stmt->bind_param("i", $idmember);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result;
+    }
+
     public function getProposalsByMember($idmember, $offset, $limit){
         $sql = "SELECT t.idteam, t.name as team_name, g.name as game_name, jp.description, jp.status 
                 FROM join_proposal jp
@@ -128,5 +141,39 @@ class Proposal extends DBParent
         $stmt->execute();
         $result = $stmt->get_result()->fetch_assoc();
         return $result['total'];
+    }
+
+    public function getApprovedTeam($idmember){
+        $sql = "SELECT jp.idteam, t.idgame 
+                FROM join_proposal jp 
+                JOIN team t ON jp.idteam = t.idteam 
+                WHERE jp.idmember = ? AND jp.status = 'approved'";
+        $stmt = $this->mysqli->prepare($sql);
+        $stmt->bind_param("i", $idmember);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result;
+    }
+
+    public function getWaitedTeam($idteam, $idmember){
+        $sql = "SELECT jp.idteam, jp.idmember 
+                FROM join_proposal jp 
+                WHERE jp.idteam = ? AND jp.status = 'waiting' AND jp.idmember = ?";
+        $stmt = $this->mysqli->prepare($sql);
+        $stmt->bind_param("ii", $idteam, $idmember);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result;
+    }
+
+    public function getStatusTeam($idteam, $idmember){
+        $sql = "SELECT jp.status 
+                FROM join_proposal jp 
+                WHERE jp.idteam = ? AND jp.idmember = ?";
+        $stmt = $this->mysqli->prepare($sql);
+        $stmt->bind_param("ii", $idteam, $idmember);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result;
     }
 }
