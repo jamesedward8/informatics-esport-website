@@ -13,13 +13,28 @@
 
     $role = isset($_SESSION['profile']) ? $_SESSION['profile'] : null;
     $user = isset($_SESSION['username']) ? $_SESSION['username'] : null;
+    $iduser = isset($_SESSION['idmember']) ? $_SESSION['idmember'] : null;
 
     $limit = 3;
     $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
     $offset = ($page - 1) * $limit;
 
     $pageAchieve = new Achievement();
-    $totalData = $pageAchieve->getTotalAchievement();
+    
+    if ($role == "admin") {
+        // Admin sees all achievements with pagination
+        $totalData = $pageAchieve->getTotalAchievement();
+        $resAch = $pageAchieve->getAchievements($offset, $limit);
+    } else if ($role == "member") {
+        // Member sees only achievements for their teams
+        $resAch = $pageAchieve->getAchievementsForMemberTeams($iduser);
+        $totalData = count($resAch);
+    } else {
+        // No user logged in: display all achievements without action buttons
+        $totalData = $pageAchieve->getTotalAchievement();
+        $resAch = $pageAchieve->getAchievements($offset, $limit);
+    }
+
     $totalPages = ceil($totalData / $limit);
 ?>
 
@@ -36,83 +51,68 @@
     </head>
 
     <body>
-        <?php
-        include('header.php');
-        ?>
-
+        <?php include('header.php'); ?>
 
         <main class="content-home">
             <article>
                 <div class="content-title">
                     <h1 class="h1-content-title">Achievements</h1>
                 </div>
+                
                 <div class="side-content-event">
-                    <form action="add_achievement.php" method="POST">
-                        <?php
-                        if ($role == "admin") {
-                            echo "<input type='submit' class='btn-add-ev' value='ADD' name='btnAdd'>";
-                        }
-                        ?>
-                    </form>
+                    <?php if ($role == "admin"): ?>
+                        <form action="add_achievement.php" method="POST">
+                            <input type="submit" class="btn-add-ev" value="ADD" name="btnAdd">
+                        </form>
+                    <?php endif; ?>
                 </div>
+                
                 <div class="content-page">
                     <?php
-                    $achievement = new Achievement();
-                    $resAch = $achievement->getAchievements($offset, $limit);
-
                     echo "<br><br>";
 
                     echo "<table class='tableEvent'>";
                     echo "<thead>";
 
+                    echo "<tr>
+                            <th>Achievement Name</th>
+                            <th>Game Name</th>
+                            <th>Team Name</th>
+                            <th>Date</th>
+                            <th>Description</th>";
+                    
+                    // Only show action columns for admin
                     if ($role == "admin") {
-                        echo "<tr>
-                                        <th>Achievement Name</th>
-                                        <th>Game Name</th>
-                                        <th>Team Name</th>
-                                        <th>Date</th>
-                                        <th>Description</th>
-                                        <th colspan=2>Action</th>
-                                    </tr>";
-                    } else {
-                        echo "<tr>
-                                        <th>Achievement Name</th>
-                                        <th>Game Name</th>
-                                        <th>Team Name</th>
-                                        <th>Date</th>
-                                        <th>Description</th>
-                                    </tr>";
+                        echo "<th colspan=2>Action</th>";
                     }
+                    
+                    echo "</tr>";
                     echo "</thead>";
                     echo "<tbody>";
 
-                    if ($resAch->num_rows == 0) {
+                    if (empty($resAch)) {
                         echo "<tr>
-                                            <td colspan='6'>No Achievement Available, Stay Tuned!</td>
-                                        </tr>";
+                                <td colspan='6'>No Achievement Available, Stay Tuned!</td>
+                              </tr>";
                     } else {
-                        while ($row = $resAch->fetch_assoc()) {
+                        foreach ($resAch as $row) {
+                            echo "<tr>
+                                    <td>" . $row['achievement_name'] . "</td>
+                                    <td>" . $row['game_name'] . "</td>
+                                    <td>" . $row['team_name'] . "</td>
+                                    <td>" . $row['date'] . "</td>
+                                    <td>" . $row['description'] . "</td>";
+
+                            // Show action buttons only for admin
                             if ($role == "admin") {
-                                echo "<tr>
-                                                <td>" . $row['achievement_name'] . "</td>
-                                                <td>" . $row['game_name'] . "</td>
-                                                <td>" . $row['team_name'] . "</td>
-                                                <td>" . $row['date'] . "</td>
-                                                <td>" . $row['description'] . "</td>
-                                                <td><a class='td-btn-edit' href='edit_achievement.php?idachievement=" . $row['idachievement'] . "' style='display:" . (($role == "admin") ? "block" : "none") . ";'>Edit</a></td>
-                                                <td><a class='td-btn-delete' href='delete_achievement.php?idachievement=" . $row['idachievement'] . "' style='display:" . (($role == "admin") ? "block" : "none") . ";'>Delete</a></td>
-                                            </tr>";
-                            } else {
-                                echo "<tr>
-                                                <td>" . $row['achievement_name'] . "</td>
-                                                <td>" . $row['game_name'] . "</td>
-                                                <td>" . $row['team_name'] . "</td>
-                                                <td>" . $row['date'] . "</td>
-                                                <td>" . $row['description'] . "</td>
-                                            </tr>";
+                                echo "<td><a class='td-btn-edit' href='edit_achievement.php?idachievement=" . $row['idachievement'] . "'>Edit</a></td>
+                                      <td><a class='td-btn-delete' href='delete_achievement.php?idachievement=" . $row['idachievement'] . "'>Delete</a></td>";
                             }
+                            
+                            echo "</tr>";
                         }
                     }
+
                     echo "</tbody>";
                     echo "</table>";
                     ?>
@@ -120,14 +120,16 @@
 
                 <div class="pagination">
                     <?php
+                    // Display pagination if the user is an admin or if no user is logged in
+                    if ($role == "admin" || $role === null) {
                         echo Pagination::createPaginationLinks($page, $totalPages);
+                    }
                     ?>
                 </div>
             </article>
         </main>
-        <?php
-            include('footer.php');
-        ?>
+
+        <?php include('footer.php'); ?>
     </body>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -135,12 +137,11 @@
         $(document).ready(function() {
             $('.td-btn-delete').click(function(e) {
                 var confirmation = confirm("Are you sure you want to delete this achievement?");
-
+                
                 if (!confirmation) {
                     e.preventDefault();
                 }
             });
         });
     </script>
-
 </html>

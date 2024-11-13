@@ -19,11 +19,12 @@
         $resEvent = $pageEvent->getEvent($offset, $limit);
     } else if ($role == "member") {
         // Fetch events only for the teams the member has joined
-        $resEvent = $pageEvent->getEventForJoinedTeam($iduser); // This should fetch all joined team events at once
-        $totalData = count($resEvent); // Count the events since we're not using pagination here for simplicity
+        $resEvent = $pageEvent->getEventForJoinedTeam($iduser);
+        $totalData = count($resEvent);
     } else {
-        $resEvent = [];
-        $totalData = 0;
+        // No user logged in: display all events without action buttons
+        $totalData = $pageEvent->getTotalEvent();
+        $resEvent = $pageEvent->getEvent($offset, $limit);
     }
 
     $totalPages = ceil($totalData / $limit);
@@ -51,83 +52,71 @@
                 </div>
                 
                 <div class="side-content-event">
-                    <form action="add_event.php" method="POST">
-                        <?php 
-                            if ($role == "admin") {
-                                echo "<input type='submit' class='btn-add-ev' value='ADD' name='btnAdd'>";
-                            }
-                        ?>
-                    </form>
+                    <?php if ($role == "admin"): ?>
+                        <form action="add_event.php" method="POST">
+                            <input type="submit" class="btn-add-ev" value="ADD" name="btnAdd">
+                        </form>
+                    <?php endif; ?>
                 </div>
                 
                 <div class="content-page">
                     <?php
-                        echo "<br><br>";
-                        echo "<table class='tableEvent'>";
-                        echo "<thead>";
-                        
-                        if ($role == "admin") {
-                            echo "<tr>
-                                    <th>Event Name</th>
-                                    <th>Date</th>
-                                    <th>Description</th>
-                                    <th colspan=2>Action</th>
-                                  </tr>";
-                        } else {
-                            echo "<tr>
-                                    <th>Event Name</th>
-                                    <th>Date</th>
-                                    <th>Description</th>
-                                  </tr>";
-                        }
+                    echo "<br><br>";
 
-                        echo "</thead>";
-                        echo "<tbody>";
+                    echo "<table class='tableEvent'>";
+                    echo "<thead>";
+                    
+                    echo "<tr>
+                            <th>Event Name</th>
+                            <th>Date</th>
+                            <th>Description</th>";
+                    
+                    if ($role == "admin") {
+                        echo "<th colspan=2>Action</th>";
+                    }
 
-                        if (empty($resEvent)) {
+                    echo "</tr>";
+                    echo "</thead>";
+                    echo "<tbody>";
+
+                    if (empty($resEvent)) {
+                        echo "<tr>
+                                <td colspan='4'>No Event Available, Stay Tuned!</td>
+                              </tr>";
+                    } else {
+                        foreach ($resEvent as $row) {
+                            $date = new DateTime($row['date']);
+                            $formatDate = $date->format('d F Y');
+
                             echo "<tr>
-                                    <td colspan='4'>No Event Available, Stay Tuned!</td>
-                                  </tr>";
-                        } else {
-                            // Loop through fetched events based on role
-                            foreach ($resEvent as $row) {
-                                $date = new DateTime($row['date']);
-                                $formatDate = $date->format('d F Y');
+                                    <td>" . $row['name'] . "</td>
+                                    <td>" . $formatDate . "</td>
+                                    <td>" . $row['description'] . "</td>";
 
-                                if ($role == "admin") {
-                                    echo "<tr>
-                                            <td>" . $row['name'] . "</td>
-                                            <td>" . $formatDate . "</td>
-                                            <td>" . $row['description'] . "</td>
-                                            <td><a class='td-btn-edit' href='edit_event.php?idevent=" . $row['idevent'] . "'>Edit</a></td>
-                                            <td><a class='td-btn-delete' href='delete_event.php?idevent=" . $row['idevent'] . "'>Delete</a></td>
-                                          </tr>";
-                                } else if ($role == "member") {
-                                    echo "<tr>
-                                            <td>" . $row['name'] . "</td>
-                                            <td>" . $formatDate . "</td>
-                                            <td>" . $row['description'] . "</td>
-                                          </tr>";
-                                }
+                            if ($role == "admin") {
+                                echo "<td><a class='td-btn-edit' href='edit_event.php?idevent=" . $row['idevent'] . "'>Edit</a></td>
+                                      <td><a class='td-btn-delete' href='delete_event.php?idevent=" . $row['idevent'] . "'>Delete</a></td>";
                             }
-                        }
 
-                        echo "</tbody>";
-                        echo "</table>";
+                            echo "</tr>";
+                        }
+                    }
+
+                    echo "</tbody>";
+                    echo "</table>";
                     ?>
                 </div>
-                
+
                 <div class="pagination">
                     <?php
-                        // Display pagination only if the user is an admin (pagination only implemented for full list)
-                        if ($role == "admin") {
-                            echo Pagination::createPaginationLinks($page, $totalPages);
-                        }
+                    if ($role == "admin" || $role === null) {
+                        echo Pagination::createPaginationLinks($page, $totalPages);
+                    }
                     ?>
                 </div>
             </article>
         </main>
-        
+
         <?php include('footer.php'); ?>
     </body>
 
