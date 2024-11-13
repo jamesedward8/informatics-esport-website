@@ -27,18 +27,18 @@ class Event extends DBParent
                 JOIN event_teams et ON e.idevent = et.idevent 
                 JOIN team_members tm ON tm.idteam = et.idteam 
                 WHERE tm.idmember = ?";
-                
+
         $stmt = $this->mysqli->prepare($sql);
         $stmt->bind_param("i", $idmember);
         $stmt->execute();
         $result = $stmt->get_result();
-    
+
         // Fetch all matching events
         $events = [];
         while ($row = $result->fetch_assoc()) {
             $events[] = $row;
         }
-        
+
         $stmt->close();
         return $events;
     }
@@ -171,6 +171,20 @@ class Event extends DBParent
     public function getTotalJoinEvent($idevent){
         $stmt = $this->mysqli->prepare("SELECT COUNT(*) AS total FROM event_teams WHERE idevent = ?");
         $stmt->bind_param('i', $idevent);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        return $result['total'];
+    }
+
+    public function getTotalEventsForMemberTeams($idmember) {
+        $sql = "SELECT COUNT(DISTINCT e.idevent) AS total
+                FROM event e
+                JOIN event_teams et ON e.idevent = et.idevent
+                JOIN team_members tm ON tm.idteam = et.idteam
+                WHERE tm.idmember = ?";
+        
+        $stmt = $this->mysqli->prepare($sql);
+        $stmt->bind_param("i", $idmember);
         $stmt->execute();
         $result = $stmt->get_result()->fetch_assoc();
         return $result['total'];

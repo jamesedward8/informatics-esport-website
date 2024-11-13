@@ -48,6 +48,19 @@ class Achievement extends DBParent
         return $achievements;
     }
 
+    public function getTotalAchievementsForMemberTeams($idmember) {
+        $sql = "SELECT COUNT(*) AS total
+                FROM achievement a
+                JOIN team t ON a.idteam = t.idteam
+                JOIN team_members tm ON tm.idteam = t.idteam
+                WHERE tm.idmember = ?";
+        
+        $stmt = $this->mysqli->prepare($sql);
+        $stmt->bind_param("i", $idmember);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        return $result['total'];
+    }
 
     public function addAchievement($arr_col){
         $stmt = $this->mysqli->prepare("INSERT INTO achievement (idteam, name, date, description) VALUES (?,?,?,?)");

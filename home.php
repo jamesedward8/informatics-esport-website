@@ -26,9 +26,9 @@
         $totalData = $pageAchieve->getTotalAchievement();
         $resAch = $pageAchieve->getAchievements($offset, $limit);
     } else if ($role == "member") {
-        // Member sees only achievements for their teams
-        $resAch = $pageAchieve->getAchievementsForMemberTeams($iduser);
-        $totalData = count($resAch);
+        // Member sees only achievements for their teams with pagination
+        $totalData = $pageAchieve->getTotalAchievementsForMemberTeams($iduser);
+        $resAch = $pageAchieve->getAchievementsForMemberTeams($iduser, $offset, $limit);
     } else {
         // No user logged in: display all achievements without action buttons
         $totalData = $pageAchieve->getTotalAchievement();
@@ -81,7 +81,6 @@
                             <th>Date</th>
                             <th>Description</th>";
                     
-                    // Only show action columns for admin
                     if ($role == "admin") {
                         echo "<th colspan=2>Action</th>";
                     }
@@ -103,7 +102,6 @@
                                     <td>" . $row['date'] . "</td>
                                     <td>" . $row['description'] . "</td>";
 
-                            // Show action buttons only for admin
                             if ($role == "admin") {
                                 echo "<td><a class='td-btn-edit' href='edit_achievement.php?idachievement=" . $row['idachievement'] . "'>Edit</a></td>
                                       <td><a class='td-btn-delete' href='delete_achievement.php?idachievement=" . $row['idachievement'] . "'>Delete</a></td>";
@@ -120,10 +118,7 @@
 
                 <div class="pagination">
                     <?php
-                    // Display pagination if the user is an admin or if no user is logged in
-                    if ($role == "admin" || $role === null) {
                         echo Pagination::createPaginationLinks($page, $totalPages);
-                    }
                     ?>
                 </div>
             </article>

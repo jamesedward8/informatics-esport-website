@@ -14,13 +14,13 @@
     $pageEvent = new Event();
     
     if ($role == "admin") {
-        // Fetch all events for admin
+        // Admin sees all events with pagination
         $totalData = $pageEvent->getTotalEvent();
         $resEvent = $pageEvent->getEvent($offset, $limit);
     } else if ($role == "member") {
-        // Fetch events only for the teams the member has joined
-        $resEvent = $pageEvent->getEventForJoinedTeam($iduser);
-        $totalData = count($resEvent);
+        // Member sees only events for the teams they have joined with pagination
+        $totalData = $pageEvent->getTotalEventsForMemberTeams($iduser);
+        $resEvent = $pageEvent->getEventForJoinedTeam($iduser, $offset, $limit);
     } else {
         // No user logged in: display all events without action buttons
         $totalData = $pageEvent->getTotalEvent();
@@ -109,9 +109,7 @@
 
                 <div class="pagination">
                     <?php
-                    if ($role == "admin" || $role === null) {
                         echo Pagination::createPaginationLinks($page, $totalPages);
-                    }
                     ?>
                 </div>
             </article>
