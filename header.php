@@ -45,22 +45,23 @@ $role = isset($_SESSION['profile']) ? $_SESSION['profile'] : null;
         </div>
 
         <!-- Responsive Combo Box -->
+        <?php
+        $current_page = basename($_SERVER['PHP_SELF']);
+        ?>
         <select class="nav-select" onchange="location = this.value;">
-            <option value="" disabled selected>Menu</option>
-            <option value="home.php">HOME</option>
-            <option value="event.php">EVENT</option>
-            <option value="game.php">DIVISION</option>
-            <option value="team.php">TEAM</option>
+            <option value="" disabled <?php echo empty($current_page) ? 'selected' : ''; ?>>Menu</option>
+            <option value="home.php" <?php echo $current_page == 'home.php' ? 'selected' : ''; ?>>HOME</option>
+            <option value="event.php" <?php echo $current_page == 'event.php' ? 'selected' : ''; ?>>EVENT</option>
+            <option value="game.php" <?php echo $current_page == 'game.php' ? 'selected' : ''; ?>>DIVISION</option>
+            <option value="team.php" <?php echo $current_page == 'team.php' ? 'selected' : ''; ?>>TEAM</option>
             <?php if ($role == "admin"): ?>
-                <option value="join_team_decide.php">RECRUITMENT</option>
-            <?php endif; ?>
-            <?php if ($role == "admin"): ?>
-                <option value="manage.php">MANAGE</option>
+                <option value="join_team_decide.php" <?php echo $current_page == 'join_team_decide.php' ? 'selected' : ''; ?>>RECRUITMENT</option>
+                <option value="manage.php" <?php echo $current_page == 'manage.php' ? 'selected' : ''; ?>>MANAGE</option>
             <?php endif; ?>
             <?php if (isset($_SESSION['username'])): ?>
-                <option value="logout.php">LOGOUT</option>
+                <option value="logout.php" <?php echo $current_page == 'logout.php' ? 'selected' : ''; ?>>LOGOUT</option>
             <?php else: ?>
-                <option value="login.php">LOGIN</option>
+                <option value="login.php" <?php echo $current_page == 'login.php' ? 'selected' : ''; ?>>LOGIN</option>
             <?php endif; ?>
         </select>
     </div>
