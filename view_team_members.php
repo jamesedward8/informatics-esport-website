@@ -1,21 +1,21 @@
 <?php
-    session_start();
-    require_once('proposalClass.php');
-    require_once('pagination.php');
+session_start();
+require_once('proposalClass.php');
+require_once('pagination.php');
 
-    $role = isset($_SESSION['profile']) ? $_SESSION['profile'] : null;
-    $user = isset($_SESSION['username']) ? $_SESSION['username'] : null;
-    $iduser = isset($_SESSION['idmember']) ? $_SESSION['idmember'] : null;
-    $view_team_id = isset($_GET['team-id']) ? $_GET['team-id'] : null;
-    $view_team_name = isset($_GET['team-name']) ? $_GET['team-name'] : null;
+$role = isset($_SESSION['profile']) ? $_SESSION['profile'] : null;
+$user = isset($_SESSION['username']) ? $_SESSION['username'] : null;
+$iduser = isset($_SESSION['idmember']) ? $_SESSION['idmember'] : null;
+$view_team_id = isset($_GET['team-id']) ? $_GET['team-id'] : null;
+$view_team_name = isset($_GET['team-name']) ? $_GET['team-name'] : null;
 
-    $limit = 3;
-    $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
-    $offset = ($page - 1) * $limit;
+$limit = 3;
+$page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+$offset = ($page - 1) * $limit;
 
-    $pageTeamMembers = new Proposal();
-    $totalData = $pageTeamMembers->getTotalTeamMembers($iduser);
-    $totalPages = ceil($totalData / $limit);
+$pageTeamMembers = new Proposal();
+$totalData = $pageTeamMembers->getTotalTeamMembers($iduser);
+$totalPages = ceil($totalData / $limit);
 ?>
 
 <!DOCTYPE html>
@@ -57,7 +57,11 @@
 
                 while ($row_team_members = $teamMembers->fetch_assoc()) {
                     echo "<tr>";
-                    echo "<td>" . ($row_team_members['username'] == $_SESSION['username'] ? "<b>" . $row_team_members['username'] . " (saya)" . "</b>" : $row_team_members['username']) . "</td>";
+                    if ($_SESSION['username'] == $row_team_members['username']) {
+                        echo "<td><b>" . $row_team_members['username'] . ' (saya)' . "</b></td>";
+                    } else {
+                        echo "<td>" . ($row_team_members['username'] == $_SESSION['username'] ? "<b>" . $row_team_members['username'] . " (saya)" . "</b>" : $row_team_members['username']) . "</td>";
+                    }
                     echo "<td>" . $row_team_members['description'] . "</td>";
                     echo "</tr>";
                 }
@@ -68,7 +72,7 @@
             </div>
             <div class="pagination">
                 <?php
-                    echo Pagination::createPaginationLinks($page, $totalPages);
+                echo Pagination::createPaginationLinks($page, $totalPages);
                 ?>
             </div>
         </article>

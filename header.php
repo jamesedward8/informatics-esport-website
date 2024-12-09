@@ -38,6 +38,7 @@ $role = isset($_SESSION['profile']) ? $_SESSION['profile'] : null;
         </div>
         <div class="nav-kanan">
             <?php if (isset($_SESSION['username'])): ?>
+                <p>Welcome, <?= $_SESSION['username'] ?></p>
                 <a href="logout.php" id="logout">LOGOUT</a>
             <?php else: ?>
                 <button class="btn-login" onclick="window.location.href='login.php';">LOGIN</button>
