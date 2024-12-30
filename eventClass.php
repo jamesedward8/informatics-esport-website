@@ -3,44 +3,54 @@ require_once("dbparent.php");
 
 class Event extends DBParent
 {
-    public function __construct(){
+    public function __construct()
+    {
         parent::__construct();
     }
 
-    public function getEvent($offset = null, $limit = null){
+    public function getEvent($offset = null, $limit = null)
+    {
         $sql = "SELECT * FROM event";
         if (!is_null($offset)) {
             $sql .= " LIMIT ?,?";
         }
 
         $stmt = $this->mysqli->prepare($sql);
-        if (!is_null(value: $offset))
+        if (!is_null(value: $offset) && !is_null($limit)) {
             $stmt->bind_param('ii', $offset, $limit);
-        $stmt->execute();
-        $res = $stmt->get_result();
-        return $res;
+            $stmt->execute();
+            $res = $stmt->get_result();
+            return $res;
+        }
     }
 
-    public function getEventForJoinedTeam($idmember) {
+    public function getEventForJoinedTeam($idmember, $offset = null, $limit = null)
+    {
         $sql = "SELECT DISTINCT e.idevent, e.name, e.date, e.description 
                 FROM event e 
                 JOIN event_teams et ON e.idevent = et.idevent 
                 JOIN team_members tm ON tm.idteam = et.idteam 
                 WHERE tm.idmember = ?";
-
-        $stmt = $this->mysqli->prepare($sql);
-        $stmt->bind_param("i", $idmember);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        // Fetch all matching events
-        $events = [];
-        while ($row = $result->fetch_assoc()) {
-            $events[] = $row;
+                
+        if (!is_null($offset)) {
+            $sql .= " LIMIT ?,?";
         }
-
-        $stmt->close();
-        return $events;
+                
+        $stmt = $this->mysqli->prepare($sql);
+        if (!is_null(value: $offset) && !is_null($limit)){
+            $stmt->bind_param("iii", $idmember, $offset, $limit);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            return $result;
+            // Fetch all matching events
+            // $events = [];
+            // while ($row = $result->fetch_assoc()) {
+            //     $events[] = $row;
+            // }
+        }
+        
+        // $stmt->close();
+        // return $events;
     }
 
     /*
@@ -54,7 +64,8 @@ class Event extends DBParent
     }
     */
 
-    public function addEvent($arr_col){
+    public function addEvent($arr_col)
+    {
         $sql = "INSERT INTO event (name, date, description) VALUES (?, ?, ?)";
         $stmt = $this->mysqli->prepare($sql);
         $stmt->bind_param("sss", $arr_col['name'], $arr_col['date'], $arr_col['desc']);
@@ -64,7 +75,8 @@ class Event extends DBParent
         return $affected_rows;
     }
 
-    public function updateEvent($arr_col){
+    public function updateEvent($arr_col)
+    {
         $sql = "UPDATE event SET name = ?, date = ?, description = ? WHERE idevent = ?";
         $stmt = $this->mysqli->prepare($sql);
         $stmt->bind_param("sssi", $arr_col['name'], $arr_col['date'], $arr_col['desc'], $arr_col['idevent']);
@@ -74,7 +86,8 @@ class Event extends DBParent
         return $affected_rows;
     }
 
-    public function getEventbyId($idevent){
+    public function getEventbyId($idevent)
+    {
         $stmt = $this->mysqli->prepare("SELECT * FROM event WHERE idevent = ?");
         $stmt->bind_param("i", $idevent);
         $stmt->execute();
@@ -84,7 +97,8 @@ class Event extends DBParent
         return $event;
     }
 
-    public function getTeamIdsForEvent($idevent) {
+    public function getTeamIdsForEvent($idevent)
+    {
         $sql = "SELECT idteam FROM event_teams WHERE idevent = ?";
 
         $stmt = $this->mysqli->prepare($sql);
@@ -100,7 +114,8 @@ class Event extends DBParent
         return $teamIds;
     }
 
-    public function deleteEvent($idevent){
+    public function deleteEvent($idevent)
+    {
         $sql = "DELETE FROM event WHERE idevent = ?";
         $stmt = $this->mysqli->prepare($sql);
         $stmt->bind_param('i', $idevent);
@@ -110,7 +125,8 @@ class Event extends DBParent
         return $affected_rows;
     }
 
-    public function getResultTeam($idevent){
+    public function getResultTeam($idevent)
+    {
         $stmt = $this->mysqli->prepare("SELECT t.idteam, t.name 
                                         FROM team t 
                                         LEFT JOIN event_teams et ON t.idteam = et.idteam AND et.idevent = ? 
@@ -121,7 +137,8 @@ class Event extends DBParent
         return $result;
     }
 
-    public function getEventTeams($idevent, $offset=null, $limit=null){
+    public function getEventTeams($idevent, $offset = null, $limit = null)
+    {
         $sql = "SELECT t.name, t.idteam, et.idevent 
                                         FROM event_teams et 
                                         JOIN team t ON et.idteam = t.idteam 
@@ -131,17 +148,18 @@ class Event extends DBParent
         }
 
         $stmt = $this->mysqli->prepare($sql);
-        if (!is_null(value: $offset)&& !is_null($limit))
-            $stmt->bind_param('iii', $idevent,$offset, $limit);
+        if (!is_null(value: $offset) && !is_null($limit))
+            $stmt->bind_param('iii', $idevent, $offset, $limit);
         else {
             $stmt->bind_param('i', $idevent);
         }
         $stmt->execute();
-        $res = $stmt->get_result(); 
+        $res = $stmt->get_result();
         return $res;
     }
 
-    public function addEventTeams($arr_col){
+    public function addEventTeams($arr_col)
+    {
         $sql = "INSERT INTO event_teams (idevent, idteam) VALUES (?, ?)";
         $stmt = $this->mysqli->prepare($sql);
         $stmt->bind_param("ii", $arr_col['idevent'], $arr_col['idteam']);
@@ -151,7 +169,8 @@ class Event extends DBParent
         return $affected_rows;
     }
 
-    public function deleteEventTeams($idevent, $idteam){
+    public function deleteEventTeams($idevent, $idteam)
+    {
         $sql = "DELETE FROM event_teams WHERE idevent = ? and idteam = ?";
         $stmt = $this->mysqli->prepare($sql);
         $stmt->bind_param('ii', $idevent, $idteam);
@@ -160,15 +179,17 @@ class Event extends DBParent
         $stmt->close();
         return $affected_rows;
     }
-    
-    public function getTotalEvent(){
+
+    public function getTotalEvent()
+    {
         $stmt = $this->mysqli->prepare("SELECT COUNT(*) AS total FROM event");
         $stmt->execute();
         $result = $stmt->get_result()->fetch_assoc();
         return $result['total'];
     }
 
-    public function getTotalJoinEvent($idevent){
+    public function getTotalJoinEvent($idevent)
+    {
         $stmt = $this->mysqli->prepare("SELECT COUNT(*) AS total FROM event_teams WHERE idevent = ?");
         $stmt->bind_param('i', $idevent);
         $stmt->execute();
@@ -176,13 +197,14 @@ class Event extends DBParent
         return $result['total'];
     }
 
-    public function getTotalEventsForMemberTeams($idmember) {
+    public function getTotalEventsForMemberTeams($idmember)
+    {
         $sql = "SELECT COUNT(DISTINCT e.idevent) AS total
                 FROM event e
                 JOIN event_teams et ON e.idevent = et.idevent
                 JOIN team_members tm ON tm.idteam = et.idteam
                 WHERE tm.idmember = ?";
-        
+
         $stmt = $this->mysqli->prepare($sql);
         $stmt->bind_param("i", $idmember);
         $stmt->execute();

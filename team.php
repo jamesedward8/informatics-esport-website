@@ -72,7 +72,7 @@
                         echo "<table class='tableEvent'>";
                         echo "<thead>";
                         echo "<tr>";
-                        echo "<th>Profile Picture</th>";
+                        echo "<th>Logo</th>";
                         echo "<th>Team Name</th>";
                         echo "<th>Game Name</th>";
                         

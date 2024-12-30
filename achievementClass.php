@@ -26,7 +26,7 @@ class Achievement extends DBParent
         }
     }
 
-    public function getAchievementsForMemberTeams($idmember) {
+    public function getAchievementsForMemberTeams($idmember, $offset = null, $limit = null) {
         $sql = "SELECT a.name AS achievement_name, t.name AS team_name, a.date, a.description, g.name AS game_name, a.  idachievement 
                 FROM achievement a
                 JOIN team t ON a.idteam = t.idteam
@@ -34,18 +34,25 @@ class Achievement extends DBParent
                 JOIN team_members tm ON tm.idteam = t.idteam
                 WHERE tm.idmember = ?";
         
-        $stmt = $this->mysqli->prepare($sql);
-        $stmt->bind_param("i", $idmember);
-        $stmt->execute();
-        $result = $stmt->get_result();
-    
-        $achievements = [];
-        while ($row = $result->fetch_assoc()) {
-            $achievements[] = $row;
+        if (!is_null($offset)) {
+            $sql .= " LIMIT ?,?";
         }
+
+        $stmt = $this->mysqli->prepare($sql);
+        if (!is_null($offset) && !is_null($limit)){
+            $stmt->bind_param("iii", $idmember, $offset, $limit);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            return $result;
+        }
+    
+        // $achievements = [];
+        // while ($row = $result->fetch_assoc()) {
+        //     $achievements[] = $row;
+        // }
         
-        $stmt->close();
-        return $achievements;
+        // $stmt->close();
+        // return $achievements;
     }
 
     public function getTotalAchievementsForMemberTeams($idmember) {

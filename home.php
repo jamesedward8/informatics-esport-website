@@ -2,6 +2,7 @@
     session_start();
     require_once('achievementClass.php');
     require_once('pagination.php');
+    require_once('dbparent.php');
 
     if (isset($_GET['login']) && $_GET['login'] == 'success') {
         echo "<script>
@@ -89,7 +90,7 @@
                     echo "</thead>";
                     echo "<tbody>";
 
-                    if (empty($resAch)) {
+                    if ($resAch->num_rows == 0) {
                         echo "<tr>
                                 <td colspan='6'>No Achievement Available, Stay Tuned!</td>
                               </tr>";

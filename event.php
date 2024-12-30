@@ -79,7 +79,7 @@
                     echo "</thead>";
                     echo "<tbody>";
 
-                    if (empty($resEvent)) {
+                    if ($resEvent->num_rows == 0) {    
                         echo "<tr>
                                 <td colspan='4'>No Event Available, Stay Tuned!</td>
                               </tr>";

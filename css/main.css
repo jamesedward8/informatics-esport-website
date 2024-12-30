@@ -103,13 +103,18 @@ header {
 }
 
 @media (max-width: 768px) {
+
     .nav-kiri,
     .nav-kanan {
-        display: none; 
+        display: none;
     }
 
-    .btn-login,.nav-select {
-        display: block; 
+    .btn-login,
+    .nav-select {
+        display: block;
+    }
+    .tableEvent {
+        font-size: 14px; /* Adjust table font size for smaller screens */
     }
 }
 
@@ -182,6 +187,7 @@ main.content {
     justify-content: center;
     align-items: center;
     margin-top: 30px;
+
 }
 
 .content-submenu-page {
@@ -202,6 +208,7 @@ main.content {
     width: 90%;
     border: 2px solid white;
     border-collapse: collapse;
+    overflow-x: auto;
 }
 
 tr,
@@ -211,6 +218,23 @@ td {
     padding: 10px;
     color: rgb(255, 127, 47);
     text-align: center;
+}
+
+/* Responsive table container */
+.table-responsive {
+    width: 100%;
+    /* Full-width container */
+    overflow-x: auto;
+    /* Enable horizontal scrolling */
+    margin: 0 auto;
+    /* Center the container */
+}
+
+.table-responsive table {
+    min-width: 600px;
+    /* Set a minimum width for the table */
+    white-space: nowrap;
+    /* Prevent text wrapping inside table cells */
 }
 
 .btn-add-ev,
