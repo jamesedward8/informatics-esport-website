@@ -12,7 +12,7 @@
             $_SESSION['idmember'] = $user['idmember'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['profile'] = $user['profile'];
-            echo "<script>window.location.href='home.php?login=success';</script>";
+            echo "<script>window.location.href='index.php?login=success';</script>";
         } 
         else {
             echo "<script>alert('Incorrect username or password!'); window.location.href='login.php';</script>";

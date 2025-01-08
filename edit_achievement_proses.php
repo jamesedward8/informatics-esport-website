@@ -15,7 +15,7 @@
         if ($achievement->updateAchievements($data) > 0) {
             echo "<script>
                     alert('Data updated successfully!');
-                    window.location.href='home.php?idevent={$data['idachievement']}&result=updated';
+                    window.location.href='index.php?idevent={$data['idachievement']}&result=updated';
                 </script>";
         } 
         else {

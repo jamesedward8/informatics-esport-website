@@ -15,7 +15,7 @@
         if ($achievement->addAchievement($data) > 0) {
             echo "<script>
                     alert('Data added successfully!');
-                    window.location.href='home.php?result=added';
+                    window.location.href='index.php?result=added';
                   </script>";
         } 
         else {

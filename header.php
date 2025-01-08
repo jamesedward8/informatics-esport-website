@@ -15,7 +15,7 @@ $role = isset($_SESSION['profile']) ? $_SESSION['profile'] : null;
     </div>
     <div class="nav">
         <div class="nav-kiri">
-            <a href="home.php" <?php echo "style = 'display:yes';" ?>>
+            <a href="index.php" <?php echo "style = 'display:yes';" ?>>
                 <nav class="navbar">HOME</nav>
             </a>
             <a href="event.php" <?php echo "style = 'display:yes';" ?>>
@@ -51,7 +51,7 @@ $role = isset($_SESSION['profile']) ? $_SESSION['profile'] : null;
         ?>
         <select class="nav-select" onchange="location = this.value;">
             <option value="" disabled <?php echo empty($current_page) ? 'selected' : ''; ?>>Menu</option>
-            <option value="home.php" <?php echo $current_page == 'home.php' ? 'selected' : ''; ?>>HOME</option>
+            <option value="index.php" <?php echo $current_page == 'index.php' ? 'selected' : ''; ?>>HOME</option>
             <option value="event.php" <?php echo $current_page == 'event.php' ? 'selected' : ''; ?>>EVENT</option>
             <option value="game.php" <?php echo $current_page == 'game.php' ? 'selected' : ''; ?>>DIVISION</option>
             <option value="team.php" <?php echo $current_page == 'team.php' ? 'selected' : ''; ?>>TEAM</option>
