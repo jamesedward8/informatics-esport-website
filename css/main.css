@@ -160,25 +160,68 @@ main.content {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column; 
+    text-align: center;
+    padding: 0 20px; 
 }
 
 .h1-content-title {
     position: relative;
     color: rgb(255, 165, 91);
-    font-size: 50px;
+    font-size: 50px; 
+    font-weight: bold;
     z-index: -1;
+    margin-bottom: 10px;
 }
 
 .h2-sub-content-title {
     color: rgb(255, 165, 91);
-    margin-top: 0;
+    font-size: 24px;
+    margin-top: 10px;
 }
 
 .p-sub-content-title {
-    margin-top: auto;
+    margin-top: 10px;
     color: red;
-    font-size: 20px;
+    font-size: 20px; 
     z-index: -1;
+}
+
+
+@media (max-width: 768px) {
+    .h1-content-title {
+        font-size: 40px; 
+    }
+
+    .h2-sub-content-title {
+        font-size: 20px;
+    }
+
+    .p-sub-content-title {
+        font-size: 16px; 
+    }
+
+    .content-title {
+        margin-top: 50px; 
+    }
+}
+
+@media (max-width: 480px) {
+    .h1-content-title {
+        font-size: 32px; 
+    }
+
+    .h2-sub-content-title {
+        font-size: 18px;
+    }
+
+    .p-sub-content-title {
+        font-size: 14px;
+    }
+
+    .content-title {
+        margin-top: 30px; 
+    }
 }
 
 .content-page,
@@ -205,36 +248,46 @@ main.content {
 }
 
 .tableEvent {
-    width: 90%;
+    width: 100%;
     border: 2px solid white;
     border-collapse: collapse;
     overflow-x: auto;
 }
 
-tr,
-th,
-td {
+.tableEvent th,
+.tableEvent td {
     border: 2px solid white;
     padding: 10px;
     color: rgb(255, 127, 47);
     text-align: center;
+    font-size: 14px; 
 }
 
-/* Responsive table container */
-.table-responsive {
-    width: 100%;
-    /* Full-width container */
-    overflow-x: auto;
-    /* Enable horizontal scrolling */
-    margin: 0 auto;
-    /* Center the container */
+.tableEvent th {
+    background-color: #001247;
+    color:rgb(255, 127, 47);
+    font-weight: bold;
 }
 
-.table-responsive table {
-    min-width: 600px;
-    /* Set a minimum width for the table */
-    white-space: nowrap;
-    /* Prevent text wrapping inside table cells */
+.table-container {
+    overflow-x: auto; 
+}
+
+
+@media (max-width: 768px) {
+    .tableEvent th,
+    .tableEvent td {
+        font-size: 12px; 
+        padding: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .tableEvent th,
+    .tableEvent td {
+        font-size: 10px;
+        padding: 6px;
+    }
 }
 
 .btn-add-ev,
@@ -409,22 +462,51 @@ td {
 .pagination {
     display: flex;
     justify-content: center;
+    flex-wrap: wrap;
     margin-top: 20px;
+    gap: 8px;
 }
 
 .page-btn {
     background-color: transparent;
     color: orange;
-    padding: 10px 15px;
+    padding: 8px 12px;
     border: 2px solid orange;
     border-radius: 5px;
     text-decoration: none;
-    transition: background-color 0.3s;
+    font-size: 14px;
+    transition: background-color 0.3s, color 0.3s;
+    text-align: center;
+    min-width: 40px;
 }
 
 .page-btn:hover {
     background-color: orange;
     color: white;
+}
+
+@media (max-width: 768px) {
+    .pagination {
+        gap: 6px;
+    }
+
+    .page-btn {
+        font-size: 12px;
+        padding: 6px 10px;
+        min-width: 30px;
+    }
+}
+
+@media (max-width: 480px) {
+    .pagination {
+        gap: 4px;
+    }
+
+    .page-btn {
+        font-size: 10px;
+        padding: 4px 8px;
+        min-width: 25px;
+    }
 }
 
 /* Chatbox Styling */
