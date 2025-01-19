@@ -4,7 +4,7 @@
     require_once('pagination.php');
     require_once('proposalClass.php');
 
-    $mysqli = new mysqli("localhost", "root", "", "esport");
+    $mysqli = new mysqli("localhost", "root", "", "fullstack");
 
 
     if ($mysqli->connect_errno) {
