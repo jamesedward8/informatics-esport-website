@@ -24,7 +24,6 @@
         <div id="admin-chat-interface" class="admin-chat-container">
             <!-- Sidebar: Daftar Pengguna (disembunyikan secara default) -->
             <div id="user-list-container" class="user-list" style="display: none;">
-                <h3>Users</h3>
                 <!-- Combo Box (Dropdown) untuk memilih user -->
                 <select id="user-select">
                     <option value="" disabled selected>Select a user</option>
@@ -103,18 +102,50 @@
             adminChatInput.disabled = false; // Mengaktifkan textbox
             adminSendBtn.disabled = false; // Mengaktifkan tombol send
 
-            // Reset chatbox dengan menghapus pesan lama
-            adminChatMessages.innerHTML = '';  // Hapus semua pesan yang ada
+            // Load histori chat yang pernah ada
+            loadChatHistory(username);
 
             // Simulasikan percakapan awal dengan user baru (atau gunakan data asli dari backend)
-            const welcomeMessage = document.createElement('div');
-            welcomeMessage.classList.add('message', 'sent');
-            welcomeMessage.textContent = `Hello, ${username}! How can I help you today?`;
-            adminChatMessages.appendChild(welcomeMessage);
+            // const welcomeMessage = document.createElement('div');
+            // welcomeMessage.classList.add('message', 'sent');
+            // welcomeMessage.textContent = `Hello, ${username}! How can I help you today?`;
+            // adminChatMessages.appendChild(welcomeMessage);
 
             // Scroll ke pesan terakhir
-            adminChatMessages.scrollTop = adminChatMessages.scrollHeight;
+            // adminChatMessages.scrollTop = adminChatMessages.scrollHeight;
         });
+
+        function loadChatHistory(username) {
+            // Clear previous messages
+            adminChatMessages.innerHTML = '';
+
+            // Simulated chat history (in real case, fetch from server)
+            const chatHistory = getChatHistoryFromServer(username);
+
+            // Display chat history
+            chatHistory.forEach(message => {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message', message.sender === 'admin' ? 'sent' : 'received');
+                messageElement.textContent = message.text;
+                adminChatMessages.appendChild(messageElement);
+            });
+
+            // Scroll to the last message
+            adminChatMessages.scrollTop = adminChatMessages.scrollHeight;
+        }
+
+        // Function to simulate fetching chat history from the server
+        function getChatHistoryFromServer(username) {
+            // Example chat history (in real case, fetch from server)
+            if (username === 'user1') {
+                return [
+                    { sender: 'user', text: 'Hello, I need help with my account.' },
+                    { sender: 'admin', text: 'Hello, how can I assist you?' }
+                ];
+            } else {
+                return [];
+            }
+        }
         
         // Fungsi untuk mengirim pesan
         adminSendBtn.addEventListener('click', () => {
@@ -124,7 +155,10 @@
                 const adminMessage = document.createElement('div');
                 adminMessage.classList.add('message', 'sent');
                 adminMessage.textContent = messageText;
-                document.getElementById('admin-chat-messages').appendChild(adminMessage);
+                adminChatMessages.appendChild(adminMessage);
+
+                // Simpan ke database atau kirim ke backend
+                sendMessageToServer('admin', messageText);
     
                 // Bersihkan input
                 adminChatInput.value = '';
@@ -142,6 +176,51 @@
             minimizedChatIcon.style.display = 'block'; // Tampilkan ikon    minimized
             adminChatInterface.style.display = 'none'; // Sembunyikan seluruh   chat interface
         });
+
+        // Fungsi untuk menampilkan pesan yang diterima oleh admin
+        function showReceivedMessage(message) {
+            const userMessage = document.createElement('div');
+            userMessage.classList.add('message', 'received');
+            userMessage.textContent = message;
+            adminChatMessages.appendChild(userMessage);
+    
+            // Scroll ke pesan terakhir
+            adminChatMessages.scrollTop = adminChatMessages.scrollHeight;
+        }
+    
+        // Simulasi menerima pesan dari user
+        function simulateIncomingMessage() {
+            // Contoh pesan yang diterima dari user
+            setTimeout(() => {
+                showReceivedMessage('Hello admin, I need assistance.');
+            }, 2000);
+        }
+    
+        // Fungsi untuk mengirim pesan ke server (misalnya melalui AJAX)
+        function sendMessageToServer(sender, message) {
+            // Misalnya menggunakan fetch atau AJAX untuk mengirim pesan ke server/database
+            // Berikut adalah contoh fungsionalitas pengiriman pesan ke server:
+    
+            console.log(`Message sent from ${sender}: ${message}`);
+            
+            setTimeout(() => {
+                // Simulasi menerima pesan dari server
+                const responseMessage = 'Thank you for your message. Our team will assist you shortly.';
+                displayReceivedMessage(responseMessage);
+            }, 1000);
+            
+        }
+
+        // Fungsi untuk menampilkan pesan yang diterima dari user
+        function displayReceivedMessage(message) {
+            const userMessage = document.createElement('div');
+            userMessage.classList.add('message', 'received');
+            userMessage.textContent = message;
+            adminChatMessages.appendChild(userMessage);
+    
+            // Scroll ke pesan terakhir
+            adminChatMessages.scrollTop = adminChatMessages.scrollHeight;
+        }
     });
 </script>
 </html>
