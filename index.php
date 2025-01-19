@@ -136,7 +136,7 @@
             ?>
         </main>
 
-        <?php //include('footer.php'); ?>
+        <?php include('footer.php'); ?>
     </body>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>

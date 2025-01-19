@@ -638,15 +638,18 @@ main.content {
 /* Admin Chatbox Styling */
 /* Layout Admin Chat */
 .admin-chat-container {
-    display: flex;
-    flex-direction: column; /* Layout vertikal pada perangkat mobile */
-    width: 100%;
-    height: 100%; /* Full height pada mobile */
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 350px;
+    height: auto;
     border: 1px solid #ccc;
     border-radius: 10px;
-    overflow: hidden;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
     z-index: 1001;
+    flex-direction: column; /* Layout vertikal pada perangkat mobile */
+    overflow-y: hidden;
 }
 
 /* Sidebar: Daftar Pengguna */
