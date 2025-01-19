@@ -34,7 +34,7 @@
                         <br><br>
 
                         <div class="mb-3">
-                            <label for="password" class="form-label, label-add-event">Password:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                            <label for="password" class="form-label, label-add-event">Password:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
                             <input type="password" name="password" class="form-control, input-add-event" id="password" placeholder="Enter your password..." required>
                         </div>
                         <br><br>

@@ -37,6 +37,9 @@
     }
 
     $totalPages = ceil($totalData / $limit);
+
+    // Show chatbox if the user is logged in
+    $isLoggedIn = isset($_SESSION['username']) && $_SESSION['username'] !== "";
 ?>
 
 <!DOCTYPE html>
@@ -123,6 +126,14 @@
                     ?>
                 </div>
             </article>
+
+            <?php 
+                if ($role == "member") {
+                    include('chatbox_member.php');
+                } else {
+                    include('chatbox_admin.php');
+                }            
+            ?>
         </main>
 
         <?php include('footer.php'); ?>
