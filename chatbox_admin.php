@@ -23,15 +23,16 @@
         <!-- Admin Chat Interface -->
         <div id="admin-chat-interface" class="admin-chat-container">
             <!-- Sidebar: Daftar Pengguna (disembunyikan secara default) -->
-            <div id="user-list-container" class="user-list" style="display: none;       ">
+            <div id="user-list-container" class="user-list" style="display: none;">
                 <h3>Users</h3>
-                <ul id="user-list">
-                    <!-- Daftar pengguna akan dimuat di sini -->
-                    <li class="user-item" data-username="user1">User 1</li>
-                    <li class="user-item" data-username="user2">User 2</li>
-                    <li class="user-item" data-username="user3">User 3</li>
+                <!-- Combo Box (Dropdown) untuk memilih user -->
+                <select id="user-select">
+                    <option value="" disabled selected>Select a user</option>
+                    <option value="user1">User 1</option>
+                    <option value="user2">User 2</option>
+                    <option value="user3">User 3</option>
                     <!-- Tambahkan lebih banyak pengguna sesuai kebutuhan -->
-                </ul>
+                </select>
             </div>
 
             <!-- Main Chatbox (disembunyikan secara default) -->
@@ -40,8 +41,7 @@
                 <div class="admin-chat-header">
                     <span id="selected-user-name">Select a user</span>
                     <div class="chat-controls">
-                        <!-- Tombol minimize -->
-                        <button id="minimize-chatbox" class="minimize-btn">&times;      </button>
+                        <button id="minimize-chatbox" class="minimize-btn">&times;</button>
                     </div>
                 </div>
 
@@ -52,8 +52,8 @@
 
                 <!-- Input Chatbox -->
                 <div class="admin-chat-input">
-                    <input type="text" id="admin-chat-input" placeholder="Type your message..." disabled />
-                    <button id="admin-send-btn" disabled>Send</button>
+                    <input type="text" id="admin-chat-input" placeholder="Type your message..." />
+                    <button id="admin-send-btn">Send</button>
                 </div>
             </div>
         </div>
@@ -66,12 +66,13 @@
         const adminChatbox = document.getElementById('admin-chatbox');
         const minimizedChatIcon = document.getElementById   ('minimized-chat-icon');
         const userListContainer = document.getElementById   ('user-list-container');
-        const userListItems = document.querySelectorAll('.user-item');
+        const userSelect = document.getElementById('user-select');
         const minimizeChatboxBtn = document.getElementById  ('minimize-chatbox');
         const restoreChatboxBtn = document.getElementById('restore-chatbox');
         const selectedUserName = document.getElementById('selected-user-name');
         const adminChatInput = document.getElementById('admin-chat-input');
         const adminSendBtn = document.getElementById('admin-send-btn');
+        const adminChatMessages = document.getElementById('admin-chat-messages');
 
         // Default: Minimize chatbox and sidebar on page load
         adminChatInterface.style.display = 'none'; // Sembunyikan chatbox
@@ -92,31 +93,29 @@
              minimizedChatIcon.style.display = 'none'; // Sembunyikan ikon  minimized
         });
 
-        // Menangani klik pada daftar pengguna
-        userListItems.forEach(item => {
-            item.addEventListener('click', function () {
-                const username = this.getAttribute('data-username'); // Ambil   nama user yang dipilih
+        // Menangani pemilihan user melalui combo box (dropdown)
+        userSelect.addEventListener('change', function () {
+            const username = this.value; // Ambil nama user yang dipilih
 
-                // Menandai user yang dipilih
-                userListItems.forEach(user => {
-                    user.classList.remove('active');
-                });
-                this.classList.add('active'); // Tandai yang dipilih
+            // Menandai user yang dipilih
+            selectedUserName.textContent = `Chatting with ${username}`;
+            adminChatbox.style.display = 'flex'; // Menampilkan chatbox
+            adminChatInput.disabled = false; // Mengaktifkan textbox
+            adminSendBtn.disabled = false; // Mengaktifkan tombol send
 
-                // Menampilkan percakapan dengan user yang dipilih
-                selectedUserName.textContent = `Chatting with ${username}`;
-                adminChatbox.style.display = 'flex'; // Menampilkan chatbox
-                adminChatInput.disabled = false; // Mengaktifkan textbox            
-                adminSendBtn.disabled = true; // Mengaktifkan tombol send
+            // Reset chatbox dengan menghapus pesan lama
+            adminChatMessages.innerHTML = '';  // Hapus semua pesan yang ada
 
-                // Simulasikan percakapan (bisa diganti dengan data dari    backend)
-                const adminMessage = document.createElement('div');
-                adminMessage.classList.add('message', 'sent');
-                adminMessage.textContent = `Hello, ${username}! How can I   help you today?`;
-                document.getElementById('admin-chat-messages').appendChild  (adminMessage);
-            });
+            // Simulasikan percakapan awal dengan user baru (atau gunakan data asli dari backend)
+            const welcomeMessage = document.createElement('div');
+            welcomeMessage.classList.add('message', 'sent');
+            welcomeMessage.textContent = `Hello, ${username}! How can I help you today?`;
+            adminChatMessages.appendChild(welcomeMessage);
+
+            // Scroll ke pesan terakhir
+            adminChatMessages.scrollTop = adminChatMessages.scrollHeight;
         });
-
+        
         // Fungsi untuk mengirim pesan
         adminSendBtn.addEventListener('click', () => {
             const messageText = adminChatInput.value.trim();
@@ -131,7 +130,7 @@
                 adminChatInput.value = '';
     
                 // Scroll ke pesan terakhir
-                document.getElementById('admin-chat-messages').scrollTop = document.getElementById('admin-chat-messages').scrollHeight;
+                adminChatMessages.scrollTop = adminChatMessages.scrollHeight;
             }
         });
 
