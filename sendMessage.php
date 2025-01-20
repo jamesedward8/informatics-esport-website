@@ -1,6 +1,9 @@
 <?php 
     require_once('dbparent.php');
 
+    $db = new DBParent();
+    $mysqli = $db->mysqli;
+
     header('Content-Type: application/json');
 
     // Check if the form is submitted
