@@ -72,8 +72,8 @@
     document.addEventListener('DOMContentLoaded', function () {
         const adminChatInterface = document.getElementById('admin-chat-interface');
         const adminChatbox = document.getElementById('admin-chatbox');
-        const minimizedChatIcon = document.getElementById   ('minimized-chat-icon');
-        const userListContainer = document.getElementById   ('user-list-container');
+        const minimizedChatIcon = document.getElementById('minimized-chat-icon');
+        const userListContainer = document.getElementById('user-list-container');
         const userSelect = document.getElementById('user-select');
         const minimizeChatboxBtn = document.getElementById  ('minimize-chatbox');
         const restoreChatboxBtn = document.getElementById('restore-chatbox');

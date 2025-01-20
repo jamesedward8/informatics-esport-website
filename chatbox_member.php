@@ -157,6 +157,7 @@
             .catch(error => {
                 console.error('Error sending message:', error);
             });
+            
             // setTimeout(() => {
                 //Simulasi menerima pesan dari server
                 // const responseMessage = 'Thank you for your message. Our team will assist you shortly.'
