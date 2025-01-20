@@ -52,52 +52,48 @@
         const chatMessages = document.getElementById('chat-messages');
         const username = chatMessages.getAttribute('data-username');
         const chatInput = document.getElementById('chat-input');
-       
+
+        let chatboxOpen = false; // Flag to check if the chatbox is open
+
         // Open chatbox
         chatIcon.addEventListener('click', () => {
             chatBox.style.display = 'flex';
             document.getElementById('chat-icon').style.display = 'none';
+            chatboxOpen = true;
             loadChatHistory(username);
+            //startFetchingMessages(username);
         });
+
         // Close chatbox
         closeChatbox.addEventListener('click', () => {
-            chatMessages.innerHTML = '';
             chatBox.style.display = 'none';
             document.getElementById('chat-icon').style.display = 'block';
+            chatboxOpen = false;
+            //stopFetchingMessages(); // Stop periodic fetching
         });
 
-        // Simulasi memilih customer service
-        selectedName.textContent = 'Chat with Customer Service';
-
-        // Fungsi untuk mengirim pesan oleh user
+        // Send message
         sendBtn.addEventListener('click', () => {
             const messageText = chatInput.value.trim();
             if (messageText) {
-                const userMessage = document.createElement('div');
-                userMessage.textContent = messageText;
-                userMessage.classList.add('message', 'sent');
-                chatMessages.appendChild(userMessage);
-
-                // Kirim pesan ke customer server
+                //appendMessage(username, messageText, true); // Append user's message immediately
                 sendMessageToServer(username, messageText);
-
-                // Bersihkan input
                 chatInput.value = '';
-
-                // Scroll ke pesan terakhir
-                chatMessages.scrollTop = chatMessages.scrollHeight;
             }
         });
 
+        // Load chat history initially
         function loadChatHistory(username) {
+            fetchMessages(username, true);
+        }
+
+        function fetchMessages(username) {
             fetch('getMessage.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    user: username,
-                })
+                body: JSON.stringify({ user: username })
             })
             .then(response => {
                 if (!response.ok) {
@@ -106,127 +102,111 @@
                 return response.json();
             })
             .then(data => {
-                console.log(data);
                 if (data.status === 'success') {
                     const messages = data.messages;
 
                     let currentDisplayedDate = '';
 
-                if (messages.length === 0) {
-                    const welcomeMessage = "Welcome to our customer service! How can we assist you today?";
-                    const messageElement = document.createElement('div');
-                    messageElement.classList.add('message', 'received');
-                    messageElement.textContent = welcomeMessage;
-                    chatMessages.appendChild(messageElement);
-
-                    // Scroll ke pesan terakhir
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                } else {
-                    // Tampilkan pesan dari database
-                    messages.forEach(message => {
-                        const messageDate = new Date(message.msg_time);
-                        const formattedDate = messageDate.toLocaleDateString('en-US', {
-                            weekday: 'long',
-                            day: 'numeric',
-                            month: 'long'
-                        });
-                        const formattedTime = messageDate.toLocaleTimeString('en-US', {
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        });
-
-                        if (formattedDate !== currentDisplayedDate) {
-                            currentDisplayedDate = formattedDate;
-
-                            const dateHeader = document.createElement('div');
-                            dateHeader.classList.add('date-header');
-                            dateHeader.textContent = currentDisplayedDate;
-                            chatMessages.appendChild(dateHeader);
-                        }
-
-                        // Tambahkan elemen pesan
+                    if (messages.length == 0) {
+                        const welcomeMessage = "Welcome to our customer service! How can i assist you today?";
                         const messageElement = document.createElement('div');
-                        messageElement.classList.add('message', message.sender === username ? 'sent' : 'received');
-
-                        // Tambahkan teks pesan
-                        const messageText = document.createElement('div');
-                        messageText.textContent = message.message;
-                        messageText.classList.add('message-text');
-                        messageElement.appendChild(messageText);
-
-                        // Tambahkan waktu pesan
-                        const messageTime = document.createElement('div');
-                        messageTime.textContent = formattedTime;
-                        messageTime.classList.add('message-time');
-                        messageElement.appendChild(messageTime);
+                        messageElement.classList.add('message', 'received');
+                        messageElement.textContent = welcomeMessage;
 
                         chatMessages.appendChild(messageElement);
-
-                        });
-
-                        // Scroll ke pesan terakhir
                         chatMessages.scrollTop = chatMessages.scrollHeight;
                     }
-                } 
-                else {
-                    console.error('Error loading chat history:', data.message);
+
+                    else {
+                        messages.forEach(message => {
+                            const messageDate = new Date(message.msg_time);
+                            const formattedDate = messageDate.toLocaleDateString('en-US', {
+                                weekday: 'long',
+                                day: 'numeric',
+                                month: 'long'
+                            });
+
+                            if (formattedDate != currentDisplayedDate) {
+                                currentDisplayedDate = formattedDate;
+
+                                const dateHeader = document.createElement('div');
+                                dateHeader.classList.add('date-header');
+                                dateHeader.textContent = currentDisplayedDate;
+                                chatMessages.appendChild(dateHeader);
+                            }
+
+                            appendMessage(
+                                message.sender,
+                                message.message,
+                                message.sender === username,
+                                message.msg_time
+                            );
+                        });
+                    }
+                } else {
+                    console.error('Error loading messages:', data.message);
                 }
             })
-            .catch(error => {
-                console.error('Error loading chat history:', error);
+            .catch(error => console.error('Error fetching messages:', error));
+        }
+
+        function appendMessage(sender, text, isSent, timestamp) {
+            // Generate a unique identifier using sender and timestamp
+            const uniqueId = `${sender}-${timestamp}`;
+
+            // Check if the message already exists in the chatbox by ID
+            if (document.getElementById(uniqueId)) return;
+
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', isSent ? 'sent' : 'received');
+            messageElement.id = uniqueId;  // Set unique ID
+
+            // Add message content
+            const messageText = document.createElement('div');
+            messageText.textContent = text;
+            messageText.classList.add('message-text');
+            messageElement.appendChild(messageText);
+
+            // Add formatted timestamp
+            const messageTime = document.createElement('div');
+            const formattedTime = new Date(timestamp).toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit'
             });
+            messageTime.textContent = formattedTime;
+            messageTime.classList.add('message-time');
+            messageElement.appendChild(messageTime);
+
+            // Append the message to the chatbox
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
         function sendMessageToServer(sender, message) {
+            const timestamp = new Date().toISOString();  // Generate timestamp
+            appendMessage(sender, message, true, timestamp);  // Append with timestamp
+
+            // Send message to the server
             fetch('sendMessage.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    sender: sender,
-                    receiver: 'admin',
-                    message: message,
-                })
+                body: JSON.stringify({ sender: sender, receiver: 'admin', message: message, timestamp: timestamp })
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
-                if (data.status === 'success') {
-                    // Kirim pesan ke server
-                    console.log('Message sent from ${sender}: ${message}');
-                    console.log(data)
-                }
-
-                else {
+                if (data.status !== 'success') {
                     console.error('Error sending message:', data.message);
                 }
             })
-            .catch(error => {
-                console.error('Error sending message:', error);
-            });
-            
-            // setTimeout(() => {
-                //Simulasi menerima pesan dari server
-                // const responseMessage = 'Thank you for your message. Our team will assist you shortly.'
-                // displayReceivedMessage(responseMessage);
-            // }, 1000);
-        }   
+            .catch(error => console.error('Error sending message:', error));
+        }
 
-        // Fungsi untuk menampilkan pesan dari customer service
+        // Display a received message
         function displayReceivedMessage(message) {
-            const receivedMessage = document.createElement('div');
-            receivedMessage.textContent = message;
-            receivedMessage.classList.add('message', 'received');
-            chatMessages.appendChild(receivedMessage);
-
-            // Scroll ke pesan terakhir
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }     
+            appendMessage('admin', message, false);
+        }
     });
 </script>
 </html>

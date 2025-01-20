@@ -127,104 +127,6 @@
             // adminChatMessages.scrollTop = adminChatMessages.scrollHeight;
         });
 
-        function loadChatHistory(username) {
-            fetch('getMessage.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    user: username,
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    let currentDisplayedDate = '';
-
-                    // Display chat history
-                    data.messages.forEach(message => {
-                        const messageDate = new Date(message.msg_time);
-                        const formattedDate = messageDate.toLocaleDateString('en-US', {
-                            weekday: 'long',
-                            day: 'numeric',
-                            month: 'long'
-                        });
-                        const formattedTime = messageDate.toLocaleTimeString('en-US', {
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        });
-
-                        if (formattedDate !== currentDisplayedDate) {
-                            currentDisplayedDate = formattedDate;
-
-                            const dateHeader = document.createElement('div');
-                            dateHeader.classList.add('date-header');
-                            dateHeader.textContent = currentDisplayedDate;
-                            adminChatMessages.appendChild(dateHeader);
-                        }
-
-                        // Create message element
-                        const messageElement = document.createElement('div');
-                        messageElement.classList.add('message', message.sender === 'admin' ? 'sent' : 'received');
-
-                        // Add message text
-                        const messageText = document.createElement('div');
-                        messageText.textContent = message.message;
-                        messageText.classList.add('message-text');
-                        messageElement.appendChild(messageText);
-
-                        // Add message time
-                        const messageTime = document.createElement('div');
-                        messageTime.textContent = formattedTime;
-                        messageTime.classList.add('message-time');
-                        messageElement.appendChild(messageTime);
-
-                        adminChatMessages.appendChild(messageElement);
-                    });
-
-                    // Scroll to the last message
-                    adminChatMessages.scrollTop = adminChatMessages.scrollHeight;
-                }
-                else {
-                    console.error('Failed to load chat history');
-                }
-            })
-            .catch(error => {
-                console.error('Error loading chat history:', error);
-            });
-        }
-
-            // Clear previous messages
-            //adminChatMessages.innerHTML = '';
-
-            // Simulated chat history (in real case, fetch from server)
-            //const chatHistory = getChatHistoryFromServer(username);
-
-            // Display chat history
-            // chatHistory.forEach(message => {
-                // const messageElement = document.createElement('div');
-                // messageElement.classList.add('message', message.sender === 'admin' ? 'sent' : 'received');
-                // messageElement.textContent = message.text;
-                // adminChatMessages.appendChild(messageElement);
-            // });
-
-            // Scroll to the last message
-            //adminChatMessages.scrollTop = adminChatMessages.scrollHeight;
-
-        // Function to simulate fetching chat history from the server
-        // function getChatHistoryFromServer(username) {
-            //Example chat history (in real case, fetch from server)
-            // if (username === 'user1') {
-                // return [
-                    // { sender: 'user', text: 'Hello, I need help with my account.' },
-                    // { sender: 'admin', text: 'Hello, how can I assist you?' }
-                // ];
-            // } else {
-                // return [];
-            // }
-        // }
-        
         // Fungsi untuk mengirim pesan
         adminSendBtn.addEventListener('click', () => {
             const messageText = adminChatInput.value.trim();
@@ -234,57 +136,112 @@
                 const adminMessage = document.createElement('div');
                 adminMessage.classList.add('message', 'sent');
                 adminMessage.textContent = messageText;
-                adminChatMessages.appendChild(adminMessage);
-
+                //adminChatMessages.appendChild(adminMessage);
                 // Simpan ke database atau kirim ke backend
                 sendMessageToServer(username, selectedUser, messageText);
-    
                 // Bersihkan input
                 adminChatInput.value = '';
-    
                 // Scroll ke pesan terakhir
                 adminChatMessages.scrollTop = adminChatMessages.scrollHeight;
             }
         });
 
-        // Minimize chatbox and sidebar
-        //minimizeChatboxBtn = document.getElementById('minimize-chatbox');
-        minimizeChatboxBtn.addEventListener('click', () => {
-            adminChatbox.style.display = 'none'; // Sembunyikan chatbox
-            userListContainer.style.display = 'none'; // Sembunyikan daftar     pengguna
-            minimizedChatIcon.style.display = 'block'; // Tampilkan ikon    minimized
-            adminChatInterface.style.display = 'none'; // Sembunyikan seluruh   chat interface
-        });
+        function loadChatHistory(username) {
+            fetchMessages(username);
+        }
 
-        // Fungsi untuk menampilkan pesan yang diterima oleh admin
-        // function showReceivedMessage(message) {
-            // const userMessage = document.createElement('div');
-            // userMessage.classList.add('message', 'received');
-            // userMessage.textContent = message;
-            // adminChatMessages.appendChild(userMessage);
+        function fetchMessages(username) {
+            fetch('getMessage.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({user: username})
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'success') {
+                    const messages = data.messages;
+
+                    let currentDisplayedDate = '';
+
+                    messages.forEach(message => {
+                        const messageDate = new Date(message.msg_time);
+                        const formattedDate = messageDate.toLocaleDateString('en-US', {
+                            weekday: 'long',
+                            day: 'numeric',
+                            month: 'long'
+                        });
+
+                        if (formattedDate != currentDisplayedDate) {
+                            currentDisplayedDate = formattedDate;
+
+                            const dateHeader = document.createElement('div');
+                            dateHeader.classList.add('date-header');
+                            dateHeader.textContent = currentDisplayedDate;
+                            adminChatMessages.appendChild(dateHeader);
+                        }
+                        
+                        appendMessage(
+                            message.sender, 
+                            message.message, 
+                            message.sender === 'admin', 
+                            message.msg_time
+                        );
+                    });
+                }
     
-            // adminChatMessages.scrollTop = adminChatMessages.scrollHeight;
-        // }
-    
-        //Simulasi menerima pesan dari user
-        // function simulateIncomingMessage() {
-            // setTimeout(() => {
-                // showReceivedMessage('Hello admin, I need assistance.');
-            // }, 2000);
-        // }
+                else {
+                    console.error('Error loading messages:', data.message);
+                }
+            })
+            .catch(error => console.error('Error fetching messages:', error));
+        }
+
+        function appendMessage(sender, text, isSent, timestamp) {
+
+            const uniqueId = `${sender}-${timestamp}`;
+
+            if (document.getElementById(uniqueId)) return;
+
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', isSent ? 'sent' : 'received');
+            messageElement.id = uniqueId;
+
+            const messageText = document.createElement('div');
+            messageText.textContent = text;
+            messageText.classList.add('message-text');
+            messageElement.appendChild(messageText);
+
+            const messageTime = document.createElement('div');
+            const formattedTime = new Date(timestamp).toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            messageTime.textContent = formattedTime;
+            messageTime.classList.add('message-time');
+            messageElement.appendChild(messageTime);
+
+            adminChatMessages.appendChild(messageElement);
+            adminChatMessages.scrollTop = adminChatMessages.scrollHeight;
+        }
     
         // Fungsi untuk mengirim pesan ke server (misalnya melalui AJAX)
         function sendMessageToServer(sender, receiver, message) {
+            const timestamp = new Date().toISOString();
+            appendMessage(sender, message, true, timestamp);
+
             fetch('sendMessage.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    sender: sender,
-                    receiver: receiver,
-                    message: message,
-                })
+                body: JSON.stringify({sender: sender, receiver: receiver, message: message, timestamp})
             })
             .then(response => response.json())
             .then(data => {
@@ -296,22 +253,11 @@
                     console.error('Error sending message:', data.message);
                 }
             });
-            // setTimeout(() => {
-                //Simulasi menerima pesan dari server
-                // const responseMessage = 'Thank you for your message. Our team will assist you shortly.';
-                // displayReceivedMessage(responseMessage);
-            // }, 1000);
         }
 
         // Fungsi untuk menampilkan pesan yang diterima dari user
         function displayReceivedMessage(message) {
-            const userMessage = document.createElement('div');
-            userMessage.classList.add('message', 'received');
-            userMessage.textContent = message;
-            adminChatMessages.appendChild(userMessage);
-    
-            // Scroll ke pesan terakhir
-            adminChatMessages.scrollTop = adminChatMessages.scrollHeight;
+            appendMessage(selectedUser, message, false);
         }
     });
 </script>
