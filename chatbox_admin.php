@@ -72,7 +72,6 @@
     document.addEventListener('DOMContentLoaded', function () {
         const adminChatInterface = document.getElementById('admin-chat-interface');
         const adminChatbox = document.getElementById('admin-chatbox');
-        const username = adminChatbox.dataset.username;
         const minimizedChatIcon = document.getElementById   ('minimized-chat-icon');
         const userListContainer = document.getElementById   ('user-list-container');
         const userSelect = document.getElementById('user-select');
@@ -82,6 +81,7 @@
         const adminChatInput = document.getElementById('admin-chat-input');
         const adminSendBtn = document.getElementById('admin-send-btn');
         const adminChatMessages = document.getElementById('admin-chat-messages');
+        const username = adminChatMessages.getAttribute('data-username');
 
         // Default: Minimize chatbox and sidebar on page load
         adminChatInterface.style.display = 'none'; // Sembunyikan chatbox
