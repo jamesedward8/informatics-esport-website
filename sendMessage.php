@@ -32,7 +32,7 @@
                         $adminUsername = $row['username'];
                         // Insert message
                         $stmt = $mysqli->prepare('INSERT INTO messages (sender, receiver, message) VALUES (?, ?, ?);');
-                        $stmt->bind_param("sss", $sender, $receiver, $message);
+                        $stmt->bind_param("sss", $sender, $adminUsername, $message);
                         $stmt->execute();
                     }
                 }

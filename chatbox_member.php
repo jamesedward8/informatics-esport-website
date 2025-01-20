@@ -61,6 +61,7 @@
         });
         // Close chatbox
         closeChatbox.addEventListener('click', () => {
+            chatMessages.innerHTML = '';
             chatBox.style.display = 'none';
             document.getElementById('chat-icon').style.display = 'block';
         });
@@ -105,18 +106,68 @@
                 return response.json();
             })
             .then(data => {
+                console.log(data);
                 if (data.status === 'success') {
-                    data.messages.forEach(message => {
-                        const messageElement = document.createElement('div');
-                        messageElement.classList.add('message', message.sender === username ? 'sent' : 'received');
-                        messageElement.textContent = message.message;
-                        chatMessages.appendChild(messageElement);
-                    });
+                    const messages = data.messages;
+
+                    let currentDisplayedDate = '';
+
+                if (messages.length === 0) {
+                    const welcomeMessage = "Welcome to our customer service! How can we assist you today?";
+                    const messageElement = document.createElement('div');
+                    messageElement.classList.add('message', 'received');
+                    messageElement.textContent = welcomeMessage;
+                    chatMessages.appendChild(messageElement);
 
                     // Scroll ke pesan terakhir
                     chatMessages.scrollTop = chatMessages.scrollHeight;
-                }
+                } else {
+                    // Tampilkan pesan dari database
+                    messages.forEach(message => {
+                        const messageDate = new Date(message.msg_time);
+                        const formattedDate = messageDate.toLocaleDateString('en-US', {
+                            weekday: 'long',
+                            day: 'numeric',
+                            month: 'long'
+                        });
+                        const formattedTime = messageDate.toLocaleTimeString('en-US', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
 
+                        if (formattedDate !== currentDisplayedDate) {
+                            currentDisplayedDate = formattedDate;
+
+                            const dateHeader = document.createElement('div');
+                            dateHeader.classList.add('date-header');
+                            dateHeader.textContent = currentDisplayedDate;
+                            chatMessages.appendChild(dateHeader);
+                        }
+
+                        // Tambahkan elemen pesan
+                        const messageElement = document.createElement('div');
+                        messageElement.classList.add('message', message.sender === username ? 'sent' : 'received');
+
+                        // Tambahkan teks pesan
+                        const messageText = document.createElement('div');
+                        messageText.textContent = message.message;
+                        messageText.classList.add('message-text');
+                        messageElement.appendChild(messageText);
+
+                        // Tambahkan waktu pesan
+                        const messageTime = document.createElement('div');
+                        messageTime.textContent = formattedTime;
+                        messageTime.classList.add('message-time');
+                        messageElement.appendChild(messageTime);
+
+                        chatMessages.appendChild(messageElement);
+
+                        });
+
+                        // Scroll ke pesan terakhir
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }
+                } 
                 else {
                     console.error('Error loading chat history:', data.message);
                 }
@@ -148,6 +199,7 @@
                 if (data.status === 'success') {
                     // Kirim pesan ke server
                     console.log('Message sent from ${sender}: ${message}');
+                    console.log(data)
                 }
 
                 else {

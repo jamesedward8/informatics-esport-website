@@ -851,3 +851,31 @@ main.content {
     color: white;
     font-size: 22px;
 }
+
+.message {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
+.message-text {
+    margin-bottom: 5px;
+}
+
+.message-time {
+    font-size: 0.8em;
+    color: gray;
+    align-self: flex-end;
+}
+
+.message.received{
+    
+}
+
+.date-header {
+    text-align: center;
+    font-size: 0.85em;
+    font-weight: bold;
+    color: #555;
+    margin: 10px 0;
+}

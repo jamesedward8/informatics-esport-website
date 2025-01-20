@@ -96,10 +96,11 @@
 
         // Restore chatbox and sidebar
         restoreChatboxBtn.addEventListener('click', () => {
+            adminChatMessages.innerHTML = '';
             adminChatbox.style.display = 'flex'; // Kembalikan chatbox
             userListContainer.style.display = 'flex'; // Tampilkan daftar   pengguna
             adminChatInterface.style.display = 'flex'; // Tampilkan seluruh     chat interface
-             minimizedChatIcon.style.display = 'none'; // Sembunyikan ikon  minimized
+            minimizedChatIcon.style.display = 'none'; // Sembunyikan ikon  minimized
         });
 
         // Menangani pemilihan user melalui combo box (dropdown)
@@ -139,22 +140,61 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
+                    let currentDisplayedDate = '';
+
                     // Display chat history
                     data.messages.forEach(message => {
+                        const messageDate = new Date(message.msg_time);
+                        const formattedDate = messageDate.toLocaleDateString('en-US', {
+                            weekday: 'long',
+                            day: 'numeric',
+                            month: 'long'
+                        });
+                        const formattedTime = messageDate.toLocaleTimeString('en-US', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+
+                        if (formattedDate !== currentDisplayedDate) {
+                            currentDisplayedDate = formattedDate;
+
+                            const dateHeader = document.createElement('div');
+                            dateHeader.classList.add('date-header');
+                            dateHeader.textContent = currentDisplayedDate;
+                            adminChatMessages.appendChild(dateHeader);
+                        }
+
+                        // Create message element
                         const messageElement = document.createElement('div');
                         messageElement.classList.add('message', message.sender === 'admin' ? 'sent' : 'received');
-                        messageElement.textContent = message.message;
+
+                        // Add message text
+                        const messageText = document.createElement('div');
+                        messageText.textContent = message.message;
+                        messageText.classList.add('message-text');
+                        messageElement.appendChild(messageText);
+
+                        // Add message time
+                        const messageTime = document.createElement('div');
+                        messageTime.textContent = formattedTime;
+                        messageTime.classList.add('message-time');
+                        messageElement.appendChild(messageTime);
+
                         adminChatMessages.appendChild(messageElement);
                     });
 
                     // Scroll to the last message
                     adminChatMessages.scrollTop = adminChatMessages.scrollHeight;
                 }
-
                 else {
                     console.error('Failed to load chat history');
                 }
+            })
+            .catch(error => {
+                console.error('Error loading chat history:', error);
             });
+        }
+
             // Clear previous messages
             //adminChatMessages.innerHTML = '';
 
@@ -171,7 +211,6 @@
 
             // Scroll to the last message
             //adminChatMessages.scrollTop = adminChatMessages.scrollHeight;
-        }
 
         // Function to simulate fetching chat history from the server
         // function getChatHistoryFromServer(username) {
