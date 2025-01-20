@@ -56,8 +56,7 @@
 
     <body>
         <?php include('header.php'); ?>
-
-        <main class="content-home">
+        <main class="content">
             <article>
                 <div class="content-title">
                     <h1 class="h1-content-title">Achievements</h1>
