@@ -1,3 +1,8 @@
+<?php 
+    require_once('dbparent.php');
+    $isLoggedIn = isset($_SESSION['username']);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,10 +32,14 @@
                 <!-- Combo Box (Dropdown) untuk memilih user -->
                 <select id="user-select">
                     <option value="" disabled selected>Select a user</option>
-                    <option value="user1">User 1</option>
-                    <option value="user2">User 2</option>
-                    <option value="user3">User 3</option>
-                    <!-- Tambahkan lebih banyak pengguna sesuai kebutuhan -->
+                    <?php 
+                        $stmt_users = $mysqli->prepare('SELECT username FROM member WHERE profile = "member";');
+                        $stmt_users->execute();
+                        $result_users = $stmt_users->get_result();
+                        while ($row = $result_users->fetch_assoc()) {
+                            echo '<option value="' . $row['username'] . '">' . $row['username'] . '</option>';
+                        }
+                    ?>
                 </select>
             </div>
 
@@ -45,13 +54,13 @@
                 </div>
 
                 <!-- Body Chatbox -->
-                <div id="admin-chat-messages" class="admin-chat-body">
+                <div id="admin-chat-messages" class="admin-chat-body" data-username="<?php echo $_SESSION['username']; ?>">
                     <!-- Pesan akan muncul di sini -->
                 </div>
 
                 <!-- Input Chatbox -->
                 <div class="admin-chat-input">
-                    <input type="text" id="admin-chat-input" placeholder="Type your message..." />
+                    <input type="text" id="admin-chat-input" placeholder="Type your message...">
                     <button id="admin-send-btn">Send</button>
                 </div>
             </div>
@@ -63,6 +72,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         const adminChatInterface = document.getElementById('admin-chat-interface');
         const adminChatbox = document.getElementById('admin-chatbox');
+        const username = adminChatbox.dataset.username;
         const minimizedChatIcon = document.getElementById   ('minimized-chat-icon');
         const userListContainer = document.getElementById   ('user-list-container');
         const userSelect = document.getElementById('user-select');
@@ -99,6 +109,7 @@
             // Menandai user yang dipilih
             selectedUserName.textContent = `Chatting with ${username}`;
             adminChatbox.style.display = 'flex'; // Menampilkan chatbox
+            adminChatMessages.innerHTML = ''; // Bersihkan chat history
             adminChatInput.disabled = false; // Mengaktifkan textbox
             adminSendBtn.disabled = false; // Mengaktifkan tombol send
 
@@ -116,40 +127,69 @@
         });
 
         function loadChatHistory(username) {
+            fetch('getMessage.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user: username,
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Display chat history
+                    data.messages.forEach(message => {
+                        const messageElement = document.createElement('div');
+                        messageElement.classList.add('message', message.sender === 'admin' ? 'sent' : 'received');
+                        messageElement.textContent = message.message;
+                        adminChatMessages.appendChild(messageElement);
+                    });
+
+                    // Scroll to the last message
+                    adminChatMessages.scrollTop = adminChatMessages.scrollHeight;
+                }
+
+                else {
+                    console.error('Failed to load chat history');
+                }
+            });
             // Clear previous messages
-            adminChatMessages.innerHTML = '';
+            //adminChatMessages.innerHTML = '';
 
             // Simulated chat history (in real case, fetch from server)
-            const chatHistory = getChatHistoryFromServer(username);
+            //const chatHistory = getChatHistoryFromServer(username);
 
             // Display chat history
-            chatHistory.forEach(message => {
-                const messageElement = document.createElement('div');
-                messageElement.classList.add('message', message.sender === 'admin' ? 'sent' : 'received');
-                messageElement.textContent = message.text;
-                adminChatMessages.appendChild(messageElement);
-            });
+            // chatHistory.forEach(message => {
+                // const messageElement = document.createElement('div');
+                // messageElement.classList.add('message', message.sender === 'admin' ? 'sent' : 'received');
+                // messageElement.textContent = message.text;
+                // adminChatMessages.appendChild(messageElement);
+            // });
 
             // Scroll to the last message
-            adminChatMessages.scrollTop = adminChatMessages.scrollHeight;
+            //adminChatMessages.scrollTop = adminChatMessages.scrollHeight;
         }
 
         // Function to simulate fetching chat history from the server
-        function getChatHistoryFromServer(username) {
-            // Example chat history (in real case, fetch from server)
-            if (username === 'user1') {
-                return [
-                    { sender: 'user', text: 'Hello, I need help with my account.' },
-                    { sender: 'admin', text: 'Hello, how can I assist you?' }
-                ];
-            } else {
-                return [];
-            }
-        }
+        // function getChatHistoryFromServer(username) {
+            //Example chat history (in real case, fetch from server)
+            // if (username === 'user1') {
+                // return [
+                    // { sender: 'user', text: 'Hello, I need help with my account.' },
+                    // { sender: 'admin', text: 'Hello, how can I assist you?' }
+                // ];
+            // } else {
+                // return [];
+            // }
+        // }
         
         // Fungsi untuk mengirim pesan
         adminSendBtn.addEventListener('click', () => {
             const messageText = adminChatInput.value.trim();
+            const selectedUser = userSelect.value;
             if (messageText) {
                 // Menambahkan pesan admin ke chatbox
                 const adminMessage = document.createElement('div');
@@ -158,7 +198,7 @@
                 adminChatMessages.appendChild(adminMessage);
 
                 // Simpan ke database atau kirim ke backend
-                sendMessageToServer('admin', messageText);
+                sendMessageToServer(username, selectedUser, messageText);
     
                 // Bersihkan input
                 adminChatInput.value = '';
@@ -169,7 +209,7 @@
         });
 
         // Minimize chatbox and sidebar
-        minimizeChatboxBtn = document.getElementById  ('minimize-chatbox');
+        //minimizeChatboxBtn = document.getElementById('minimize-chatbox');
         minimizeChatboxBtn.addEventListener('click', () => {
             adminChatbox.style.display = 'none'; // Sembunyikan chatbox
             userListContainer.style.display = 'none'; // Sembunyikan daftar     pengguna
@@ -178,37 +218,50 @@
         });
 
         // Fungsi untuk menampilkan pesan yang diterima oleh admin
-        function showReceivedMessage(message) {
-            const userMessage = document.createElement('div');
-            userMessage.classList.add('message', 'received');
-            userMessage.textContent = message;
-            adminChatMessages.appendChild(userMessage);
+        // function showReceivedMessage(message) {
+            // const userMessage = document.createElement('div');
+            // userMessage.classList.add('message', 'received');
+            // userMessage.textContent = message;
+            // adminChatMessages.appendChild(userMessage);
     
-            // Scroll ke pesan terakhir
-            adminChatMessages.scrollTop = adminChatMessages.scrollHeight;
-        }
+            // adminChatMessages.scrollTop = adminChatMessages.scrollHeight;
+        // }
     
-        // Simulasi menerima pesan dari user
-        function simulateIncomingMessage() {
-            // Contoh pesan yang diterima dari user
-            setTimeout(() => {
-                showReceivedMessage('Hello admin, I need assistance.');
-            }, 2000);
-        }
+        //Simulasi menerima pesan dari user
+        // function simulateIncomingMessage() {
+            // setTimeout(() => {
+                // showReceivedMessage('Hello admin, I need assistance.');
+            // }, 2000);
+        // }
     
         // Fungsi untuk mengirim pesan ke server (misalnya melalui AJAX)
-        function sendMessageToServer(sender, message) {
-            // Misalnya menggunakan fetch atau AJAX untuk mengirim pesan ke server/database
-            // Berikut adalah contoh fungsionalitas pengiriman pesan ke server:
+        function sendMessageToServer(sender, receiver, message) {
+            fetch('sendMessage.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    sender: sender,
+                    receiver: receiver,
+                    message: message,
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    console.log('Message sent from ${sender} to ${receiver}: ${message}');
+                }
     
-            console.log(`Message sent from ${sender}: ${message}`);
-            
-            setTimeout(() => {
-                // Simulasi menerima pesan dari server
-                const responseMessage = 'Thank you for your message. Our team will assist you shortly.';
-                displayReceivedMessage(responseMessage);
-            }, 1000);
-            
+                else {
+                    console.error('Error sending message:', data.message);
+                }
+            });
+            // setTimeout(() => {
+                //Simulasi menerima pesan dari server
+                // const responseMessage = 'Thank you for your message. Our team will assist you shortly.';
+                // displayReceivedMessage(responseMessage);
+            // }, 1000);
         }
 
         // Fungsi untuk menampilkan pesan yang diterima dari user

@@ -1,3 +1,7 @@
+<?php 
+    require_once('dbparent.php');
+    $isLoggedIn = isset($_SESSION['username']);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,13 +29,11 @@
                 <span id="selected-name">Chat with Customer Service</span>
                 <button id="close-chatbox" class="close-btn">&times;</button>
             </div>
-            <div class="chatbox-body">
-                <div class="chat-messages" id="chat-messages">
-                    <!-- Messages will appear here -->
-                </div>
+            <div class="chatbox-body" id="chat-messages" data-username="<?php echo $_SESSION['username']; ?>">
+                <!-- Messages will appear here -->
             </div>
             <div class="chatbox-input">
-                <input type="text" id="chat-input" placeholder="Type your message..." />
+                <input type="text" id="chat-input" placeholder="Type your message...">
                 <button id="send-btn" class="send-btn">
                     <i class="fa-solid fa-paper-plane"></i>
                 </button>
@@ -43,21 +45,23 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const chatIcon = document.getElementById('open-chatbox');
-        const chatbox = document.getElementById('chatbox');
+        const chatBox = document.getElementById('chatbox');
         const closeChatbox = document.getElementById('close-chatbox');
         const sendBtn = document.getElementById('send-btn');
         const selectedName = document.getElementById('selected-name');
         const chatMessages = document.getElementById('chat-messages');
+        const username = chatMessages.getAttribute('data-username');
         const chatInput = document.getElementById('chat-input');
        
         // Open chatbox
         chatIcon.addEventListener('click', () => {
-            chatbox.style.display = 'flex';
+            chatBox.style.display = 'flex';
             document.getElementById('chat-icon').style.display = 'none';
+            loadChatHistory(username);
         });
         // Close chatbox
         closeChatbox.addEventListener('click', () => {
-            chatbox.style.display = 'none';
+            chatBox.style.display = 'none';
             document.getElementById('chat-icon').style.display = 'block';
         });
 
@@ -74,7 +78,7 @@
                 chatMessages.appendChild(userMessage);
 
                 // Kirim pesan ke customer server
-                sendMessageToServer('user', messageText);
+                sendMessageToServer(username, messageText);
 
                 // Bersihkan input
                 chatInput.value = '';
@@ -84,15 +88,80 @@
             }
         });
 
-        function sendMessageToServer(sender, message) {
-            // Kirim pesan ke server
-            console.log('Message sent from ${sender}: ${message}');
+        function loadChatHistory(username) {
+            fetch('getMessage.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user: username,
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'success') {
+                    data.messages.forEach(message => {
+                        const messageElement = document.createElement('div');
+                        messageElement.classList.add('message', message.sender === username ? 'sent' : 'received');
+                        messageElement.textContent = message.message;
+                        chatMessages.appendChild(messageElement);
+                    });
 
-            setTimeout(() => {
-                // Simulasi menerima pesan dari server
-                const responseMessage = 'Thank you for your message. Our team will assist you shortly.'
-                displayReceivedMessage(responseMessage);
-            }, 1000);
+                    // Scroll ke pesan terakhir
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+
+                else {
+                    console.error('Error loading chat history:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading chat history:', error);
+            });
+        }
+
+        function sendMessageToServer(sender, message) {
+            fetch('sendMessage.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    sender: sender,
+                    receiver: 'admin',
+                    message: message,
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'success') {
+                    // Kirim pesan ke server
+                    console.log('Message sent from ${sender}: ${message}');
+                }
+
+                else {
+                    console.error('Error sending message:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error sending message:', error);
+            });
+            // setTimeout(() => {
+                //Simulasi menerima pesan dari server
+                // const responseMessage = 'Thank you for your message. Our team will assist you shortly.'
+                // displayReceivedMessage(responseMessage);
+            // }, 1000);
         }   
 
         // Fungsi untuk menampilkan pesan dari customer service

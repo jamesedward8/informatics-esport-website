@@ -130,9 +130,9 @@
             <?php 
                 if ($role == "member") {
                     include('chatbox_member.php');
-                } else {
+                } else if ($role == "admin") {
                     include('chatbox_admin.php');
-                }            
+                }       
             ?>
         </main>
 
