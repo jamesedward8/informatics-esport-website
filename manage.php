@@ -34,7 +34,7 @@
         <main class="content">
             <article>
                 <div class="content-title">
-                    <h1 class="h1-content-title">Manage Teams</h1>
+                    <h1 class="h1-content-title">Team Manager</h1>
                 </div>
                 <div class="content-page">
                     <?php
