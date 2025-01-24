@@ -100,6 +100,13 @@
             $mysqli->close();
             ?>
         </main>
+        <?php 
+                if ($role == "member") {
+                    include('chatbox_member.php');
+                } else if ($role == "admin") {
+                    include('chatbox_admin.php');
+                }       
+            ?>
     </body>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>

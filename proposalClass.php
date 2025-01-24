@@ -12,7 +12,8 @@ class Proposal extends DBParent
                             FROM join_proposal jp 
                             INNER JOIN team t ON jp.idteam = t.idteam 
                             INNER JOIN game g ON t.idgame = g.idgame 
-                            INNER JOIN member m ON jp.idmember = m.idmember";
+                            INNER JOIN member m ON jp.idmember = m.idmember
+                            ORDER BY jp.status";
         if (!is_null($offset)) {
             $sql .= " LIMIT ?,?";
         }

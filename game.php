@@ -101,6 +101,13 @@
                 </div>
             </article>
         </main>
+        <?php 
+                if ($role == "member") {
+                    include('chatbox_member.php');
+                } else if ($role == "admin") {
+                    include('chatbox_admin.php');
+                }       
+            ?>
         <?php  
             include('footer.php');
         ?>
